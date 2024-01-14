@@ -1,0 +1,5 @@
+*.txt
+/x64
+/build
+/.git
+c_cpp_properties.json
