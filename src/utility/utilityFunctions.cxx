@@ -1,4 +1,4 @@
-#include "../include/sharedFunctions.hpp"
+#include "../include/utility/utilityFunctions.hpp"
 
 // Return a reasonable mime type based on the extension of a file.
 beast::string_view mime_type(beast::string_view path) {
@@ -32,7 +32,9 @@ beast::string_view mime_type(beast::string_view path) {
     if (iequals(ext, ".tif"))  return "image/tiff";
     if (iequals(ext, ".svg"))  return "image/svg+xml";
     if (iequals(ext, ".svgz")) return "image/svg+xml";
-    if (iequals(ext, ".ttf")) return "text/css";
+    if (iequals(ext, ".ttf")) return "font/ttf";
+    if (iequals(ext, ".woff")) return "font/woff";
+    if (iequals(ext, ".woff2")) return "text/woff2";
     return "application/text";
 }
 

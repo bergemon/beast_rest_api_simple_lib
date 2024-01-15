@@ -1,6 +1,6 @@
 #pragma once
 #include "../dependencies.hpp"
-#include "handleRequest.hpp"
+#include "../requestHandlers/handleRequest.hpp"
 
 namespace Session {
     // Handles an HTTP server connection
