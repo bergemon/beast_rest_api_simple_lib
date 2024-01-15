@@ -1,22 +1,24 @@
 #pragma once
 #include "../utility/utilityFunctions.hpp"
+#include "../server/route.hpp"
 #include "errorCodes.hpp"
 
 namespace HandleRequest {
     template <class Body, class Allocator>
-    http::message_generator handle_request(http::request<Body, http::basic_fields<Allocator>>&& req) {
-        // Make sure we can handle the method
-        if (req.method() != http::verb::get
-            && req.method() != http::verb::head
-            && req.method() != http::verb::post)
-            return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Unknown HTTP-method");
+    http::message_generator handle_request(
+        http::request<Body, http::basic_fields<Allocator>>&& req,
+        std::vector<bergemon::Route>& routes)
+    {
+        for (const auto& elem : routes) {
+            if (!elem.isValid(req.target()))
+                return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Illegal request-target");
 
-        // Request path must be absolute and not contain ".." or "//".
-        if (req.target().empty()
-            || req.target()[0] != '/'
-            || req.target().find("//") != beast::string_view::npos
-            || req.target().find("..") != beast::string_view::npos)
-            return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Illegal request-target");
+            if (!elem.isTarget(req.target()))
+                return ErrorCodes::not_found(req.version(), req.keep_alive(), req.target());
+
+            if (!elem.methodAllowed(req.method()))
+                return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Unknown HTTP-method");
+        }
 
         // Build the path to the requested file
         std::string path = path_cat(".", req.target());
@@ -27,10 +29,6 @@ namespace HandleRequest {
         beast::error_code ec;
         http::file_body::value_type body;
         body.open(path.c_str(), beast::file_mode::scan, ec);
-
-        // Handle the case where the file doesn't exist
-        if(ec == beast::errc::no_such_file_or_directory)
-            return ErrorCodes::not_found(req.version(), req.keep_alive(), req.target());
 
         // Handle an unknown error
         if(ec)

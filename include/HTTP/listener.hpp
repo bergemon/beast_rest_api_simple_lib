@@ -1,16 +1,16 @@
 #pragma once
 #include "session.hpp"
 
-namespace Server {
-    class server : public std::enable_shared_from_this<server> {
-
+namespace Listener {
+    class Listener : public std::enable_shared_from_this<Listener> {
         asio::io_context& m_context;
         tcp::acceptor m_acceptor;
+        std::vector<bergemon::Route>& m_routes;
 
     public:
-        server(asio::io_context& context, tcp::endpoint endpoint)
-            : m_context(context), m_acceptor(asio::make_strand(m_context)) {
-
+        Listener(asio::io_context& context, tcp::endpoint endpoint, std::vector<bergemon::Route>& routes)
+            : m_context(context), m_acceptor(asio::make_strand(m_context)), m_routes(routes)
+        {
             beast::error_code ec;
 
             m_acceptor.open(endpoint.protocol(), ec);
@@ -38,14 +38,12 @@ namespace Server {
             }
         } // End of constructor
 
-        void run() {
-            do_accept();
-        }
+        void run() { do_accept(); }
 
     private:
         void do_accept() {
             m_acceptor.async_accept(asio::make_strand(m_context),
-                beast::bind_front_handler(&server::on_accept, shared_from_this()));
+                beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
         }
 
         void on_accept(beast::error_code ec, tcp::socket socket) {
@@ -54,7 +52,7 @@ namespace Server {
                 return;
             }
             else
-                std::make_shared<Session::session>(std::move(socket))->run();
+                std::make_shared<Session::Session>(std::move(socket), m_routes)->run();
 
             do_accept();
         }

@@ -1,3 +1,5 @@
+#pragma once
+
 namespace ErrorCodes {
     // Returns a bad request response
     const http::message_generator bad_request(const uint32_t version, const bool keep_alive, const std::string why) {

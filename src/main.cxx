@@ -1,5 +1,5 @@
 ﻿#include "../include/dependencies.hpp"
-#include "../include/HTTP/server.hpp"
+#include "../include/server/server.hpp"
 #include "include/variables.hpp"
 
 #define _DEBUG
@@ -30,19 +30,26 @@ int main(int argc, char** argv) {
     if (argc > 2)
         threads = std::max<int>(1, std::atoi(argv[2]));
 
-    asio::io_context context_{ threads };
+    bergemon::Server server(port, threads);
 
-    // Create and launch a listening port
-    std::make_shared<Server::server>(context_, tcp::endpoint{ tcp::v4(), port })->run();
-
-    // Run the I/O service on the requested number of threads
-    std::vector<std::thread> threadsArray;
-    threadsArray.reserve(threads - 1);
-    for (auto i = threads - 1; i > 0; --i)
-        threadsArray.emplace_back([&context_] { context_.run(); });
-    context_.run();
+    server.ROUTE(
+        // Allowed methods for this route
+        { Method::GET, Method::HEAD },
+        // Route target
+        "/users",
+        // Queries
+        { {"min"}, {"max"} },
+        // Route handler
+        [&](const uint32_t version, const bool keep_alive) {
+            http::response<http::string_body> res{http::status::bad_request, version};
+            res.set(http::field::server, "Rest API by bergemon");
+            res.set(http::field::content_type, "text/plain");
+            res.keep_alive(keep_alive);
+            res.body() = std::string("Hello!");
+            res.prepare_payload();
+            return res;
+        }
+    );
 
     return EXIT_SUCCESS;
-
-    return 0;
 }
