@@ -29,25 +29,27 @@ namespace bergemon {
 
     private:
         size_t check(const char* body) {
-            uint32_t counter = 0;
+            uint64_t counter = 0;
             while(body[counter] != '\0') { ++counter; }
-            return counter;
+            return ++counter;
         }
         size_t check(char* body) {
-            uint32_t counter = 0;
+            uint64_t counter = 0;
             while(body[counter] != '\0') { ++counter; }
-            return counter;
+            return ++counter;
         }
 
         void initialize(size_t size, const char* body) {
             m_size = size;
-            for (int i = 0; i < (int(size) - 1); ++i)
+            m_body = new char[size];
+            for (unsigned long long i = 0; i < size; ++i)
             { m_body[i] = body[i]; }
         }
 
         void initialize(size_t size, char* body) {
             m_size = size;
-            for (int i = 0; i < (int(size) - 1); ++i)
+            m_body = new char[size];
+            for (unsigned long long i = 0; i < size; ++i)
             { m_body[i] = body[i]; }
         }
 
@@ -56,9 +58,9 @@ namespace bergemon {
         Response() { }
         // copying constructor for child class
         Response(const Response& res) : m_type(res.m_type)
-        { initialize(check(res.m_body), res.m_body); }
+        { initialize(res.m_size, res.m_body); }
         // array of chars body
-        Response(BodyType type, const char* body) : m_type(type)
+        Response(const char* body) : m_type(BodyType::TEXT)
         { initialize(check(body), body); }
         // const char body
         Response(BodyType type, char* body) : m_type(type)
@@ -66,6 +68,7 @@ namespace bergemon {
         // string body
         Response(std::string body) : m_type(BodyType::TEXT)
         { initialize(check(body.c_str()), body.c_str()); }
+        ~Response() { delete[] m_body; }
 
         // set body type
         void bodyType(BodyType type) { m_type = type; }

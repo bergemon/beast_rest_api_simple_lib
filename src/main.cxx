@@ -38,16 +38,36 @@ int main(int argc, char** argv) {
         // Route target<string>
         "/users",
         // Queries (query<string>, is_required<bool>, type<enum Type>)
-        { {"min", true, INT}, {"max", true, INT} },
+        { {"min", true, INT_}, {"max", true, INT_} },
         // Route handler
-        [&](std::string target, std::list<ParsedQuery> queries, Method method) {
+        [&](std::string target, std::list<ParsedQuery>& queries, Method method) {
             bergemon::Response res;
-            res.body("Test response");
+
+            int min, max;
+            for (const auto& elem : queries) {
+                if (elem.query() == "min") {
+                    min = std::atoi(elem.value().c_str());
+                }
+                if (elem.query() == "max") {
+                    max = std::atoi(elem.value().c_str());
+                }
+            }
+
+            std::stringstream ss;
+
+            ss << "This is test response!\n"
+                << "Query parameters:\n"
+                << "min = " << min << '\n'
+                << "max = " << max;
+
+            res.body(ss.str());
             res.bodyType(TEXT);
 
             return res;
         }
     );
+
+    server.run();
 
     return EXIT_SUCCESS;
 }

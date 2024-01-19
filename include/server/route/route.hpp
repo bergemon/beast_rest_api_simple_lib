@@ -3,7 +3,7 @@
 
 namespace bergemon {
 
-    enum Type { STRING, INT, BOOL };
+    enum Type { STR_, INT_, BOOL_ };
 
     enum Method { HEAD, GET, POST, PUT, DELETE_, PATCH };
 
@@ -13,7 +13,7 @@ namespace bergemon {
         const Type m_type;
 
     public:
-        Query(const std::string query, const bool required = false, const Type type = Type::STRING)
+        Query(const std::string query, const bool required = false, const Type type = Type::STR_)
             : m_query(query), m_required(required), m_type(type)
         { }
 
@@ -56,7 +56,7 @@ namespace bergemon {
         bool isValid (const std::string target = "0") {
             if (target.find("..") != std::string::npos
                 || target.find("//") != std::string::npos
-                || target.at(1) != '/'
+                || target.at(0) != '/'
                 || target.length() < 2)
             { return false; }
 
@@ -168,9 +168,9 @@ namespace bergemon {
 }
 
 // Type of query
-using bergemon::Type::BOOL;
-using bergemon::Type::INT;
-using bergemon::Type::STRING;
+using bergemon::Type::BOOL_;
+using bergemon::Type::INT_;
+using bergemon::Type::STR_;
 
 // Methods
 using bergemon::Method::DELETE_;

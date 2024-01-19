@@ -17,9 +17,9 @@ bergemon::Method convertMethod(http::verb method) {
             return Method::DELETE_;
         case http::verb::patch:
             return Method::PATCH;
+        default:
+            return Method::HEAD;
     }
-
-    return Method::HEAD;
 }
 
 http::message_generator createResponse(
