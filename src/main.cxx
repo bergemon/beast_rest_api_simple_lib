@@ -1,5 +1,5 @@
 ﻿#include "../include/dependencies.hpp"
-#include "../include/server/server.hpp"
+#include "../include/server.hpp"
 #include "include/variables.hpp"
 
 #define _DEBUG
@@ -33,20 +33,18 @@ int main(int argc, char** argv) {
     bergemon::Server server(port, threads);
 
     server.ROUTE(
-        // Allowed methods for this route
-        { Method::GET, Method::HEAD },
-        // Route target
+        // Allowed methods<enum Method> for this route
+        { GET, HEAD },
+        // Route target<string>
         "/users",
-        // Queries
-        { {"min"}, {"max"} },
+        // Queries (query<string>, is_required<bool>, type<enum Type>)
+        { {"min", true, INT}, {"max", true, INT} },
         // Route handler
-        [&](const uint32_t version, const bool keep_alive) {
-            http::response<http::string_body> res{http::status::bad_request, version};
-            res.set(http::field::server, "Rest API by bergemon");
-            res.set(http::field::content_type, "text/plain");
-            res.keep_alive(keep_alive);
-            res.body() = std::string("Hello!");
-            res.prepare_payload();
+        [&](std::string target, std::list<ParsedQuery> queries, Method method) {
+            bergemon::Response res;
+            res.body("Test response");
+            res.bodyType(TEXT);
+
             return res;
         }
     );

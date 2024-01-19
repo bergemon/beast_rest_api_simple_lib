@@ -12,9 +12,6 @@ set(
 
     # Entry point
     src/main.cxx
-
-    # Utility functions
-    src/utility/utilityFunctions.cxx
 )
 
 set (
@@ -23,16 +20,21 @@ set (
     # Project general dependencies
     include/dependencies.hpp
 
-    # HTTP listener & sessions
-    include/HTTP/listener.hpp
-    include/HTTP/session.hpp
-
     # Server class
-    include/server/server.hpp
-    include/server/route.hpp
+    include/server.hpp
+
+    # HTTP listener & sessions
+    include/server/HTTP/listener.hpp
+    include/server/HTTP/session.hpp
+
+    # Route class
+    include/server/route/route.hpp
+
+    # Response class
+    include/server/response/response.hpp
 
     # Utility functions
-    include/utility/utilityFunctions.hpp
+    include/server/utility/utilityFunctions.hpp
 )
 
 set(
@@ -75,10 +77,9 @@ else()
     message(STATUS "nlohmann_json NOT found!")
 endif(nlohmann_json_FOUND)
 
-find_package(Boost 1.82 REQUIRED url)
+find_package(Boost 1.82 REQUIRED)
 if (Boost_FOUND)
     target_include_directories(${EXECUTABLE_NAME} PUBLIC ${Boost_INCLUDE_DIRS})
-    target_link_libraries(${EXECUTABLE_NAME} Boost::url)
 else ()
     message(STATUS "Boost NOT found!")
 endif(Boost_FOUND)

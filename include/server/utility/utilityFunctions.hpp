@@ -1,4 +1,22 @@
-#include "../include/utility/utilityFunctions.hpp"
+#pragma once
+
+// List of core dependencies
+#include <string>
+#include <cstdint>
+#include <vector>
+#include <list>
+#include <boost/asio.hpp>
+#include <boost/beast.hpp>
+#include <boost/config.hpp>
+#include <boost/optional.hpp>
+
+namespace beast = boost::beast;				// from <boost/beast.hpp>
+namespace http = beast::http;				// from <boost/beast/http.hpp>
+namespace asio = boost::asio;				// from <boost/asio.hpp>
+namespace ssl = boost::asio::ssl;			// from <boost/asio/ssl.hpp>
+using tcp = boost::asio::ip::tcp;			// from <boost/asio/ip/tcp.hpp>
+namespace filesystem = std::filesystem;		// filesystem
+namespace websocket = beast::websocket;		// from <boost/beast/websocket.hpp>
 
 // Return a reasonable mime type based on the extension of a file.
 beast::string_view mime_type(beast::string_view path) {

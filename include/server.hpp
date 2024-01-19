@@ -1,5 +1,5 @@
 #pragma once
-#include "../HTTP/listener.hpp"
+#include "server/HTTP/listener.hpp"
 
 namespace bergemon {
     // Server class that can handle request - check routes, queries and make response
@@ -27,7 +27,7 @@ namespace bergemon {
 
         // Put new route to handle by the server
         void ROUTE (std::vector<Method> methods, std::string target, std::vector<Query> queries,
-            std::function<http::message_generator(const uint32_t, const bool)> handler)
+            std::function<Response(std::string, std::list<ParsedQuery>&, Method)> handler)
         {
             m_routes.push_back(Route{ methods, target, queries, handler });
         }

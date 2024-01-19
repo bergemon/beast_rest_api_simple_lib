@@ -1,10 +1,11 @@
 #pragma once
+#include "../response/response.hpp"
 
 namespace bergemon {
 
     enum Type { STRING, INT, BOOL };
 
-    enum Method { HEAD, GET, POST, PUT, DELETE, PATCH };
+    enum Method { HEAD, GET, POST, PUT, DELETE_, PATCH };
 
     class Query {
         const std::string m_query;
@@ -21,12 +22,12 @@ namespace bergemon {
         bool isRequired () const { return m_required; }
     };
 
-    class parsedQuery {
+    class ParsedQuery {
         const std::string m_query;
         const std::string m_value;
         
     public:
-        parsedQuery(std::string query, std::string value)
+        ParsedQuery(std::string query, std::string value)
             : m_query(query), m_value(value) {}
         std::string query() const { return m_query; }
         std::string value() const { return m_value; }
@@ -36,11 +37,19 @@ namespace bergemon {
         const std::vector<Method> m_methods;
         const std::string m_target;
         const std::vector<Query> m_queries;
-        const std::function<http::message_generator(const uint32_t, const bool)> m_handler;
+        // Route handler
+        const std::function
+            // handler prototype
+            <Response(std::string, std::list<ParsedQuery>&, Method)>
+            m_handler;
 
     public:
         Route(const std::vector<Method> methods, const std::string target, const std::vector<Query> queries,
-            const std::function<http::message_generator(const uint32_t, const bool)> handler)
+            const std::function
+                // handler prototype
+                <Response(std::string, std::list<ParsedQuery>&, Method)>
+                handler
+        )
             : m_methods(methods), m_target(target), m_queries(queries), m_handler(handler)
         { }
 
@@ -64,8 +73,8 @@ namespace bergemon {
             return false;
         }
 
-        std::list<parsedQuery> parseQueries (const std::string target) {
-            std::list<parsedQuery> queries;
+        std::list<ParsedQuery> parseQueries (const std::string target) {
+            std::list<ParsedQuery> queries;
             bool last = false;
             std::string tempStr{ target.substr(target.find("?") + 1,
                 target.length() - (target.find("?") + 1)) };
@@ -84,7 +93,7 @@ namespace bergemon {
                 else {
                     queries.push_back({
                         tempStr.substr(0, tempStr.find("=")),
-                        tempStr.substr(tempStr.find("=") + 1, tempStr.length() - (tempStr.find("=") + 2))
+                        tempStr.substr(tempStr.find("=") + 1, tempStr.length() - (tempStr.find("=") + 1))
                     });
                 }
             }
@@ -92,7 +101,7 @@ namespace bergemon {
             return queries;
         }
 
-        bool queriesExist (const std::list<parsedQuery> parsed_queries) {
+        bool queriesExist (const std::list<ParsedQuery> parsed_queries) {
             bool found = false;
 
             // Required query must exist
@@ -139,7 +148,7 @@ namespace bergemon {
                     return true;
                 if (elem == Method::PUT && method == http::verb::put)
                     return true;
-                if (elem == Method::DELETE && method == http::verb::delete_)
+                if (elem == Method::DELETE_ && method == http::verb::delete_)
                     return true;
                 if (elem == Method::PATCH && method == http::verb::patch)
                     return true;
@@ -147,8 +156,30 @@ namespace bergemon {
 
             return false;
         }
+
+        const std::function
+            // handler prototype
+            <Response(std::string, std::list<ParsedQuery>&, Method)>
+        handler() const
+        {
+            return m_handler;
+        }
     };
 }
 
+// Type of query
+using bergemon::Type::BOOL;
+using bergemon::Type::INT;
+using bergemon::Type::STRING;
+
+// Methods
+using bergemon::Method::DELETE_;
+using bergemon::Method::GET;
+using bergemon::Method::HEAD;
+using bergemon::Method::PATCH;
+using bergemon::Method::POST;
+using bergemon::Method::PUT;
+
+// Parameters for handler prototype
+using bergemon::ParsedQuery;
 using bergemon::Method;
-using bergemon::Query;
