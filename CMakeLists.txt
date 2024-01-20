@@ -12,29 +12,29 @@ set(
 
     # Entry point
     src/main.cxx
+
+    # Routes
+    src/routes/users.cxx
 )
 
 set (
     HEADER_FILES
 
+    # Simple server lib
+    simple_server/server.hpp
+    simple_server/net_handler.hpp
+    simple_server/server/HTTP/listener.hpp
+    simple_server/server/HTTP/session.hpp
+    simple_server/server/route/route.hpp
+    simple_server/server/response/response.hpp
+    simple_server/server/utility/utilityFunctions.hpp
+
     # Project general dependencies
     include/dependencies.hpp
 
-    # Server class
-    include/server.hpp
-
-    # HTTP listener & sessions
-    include/server/HTTP/listener.hpp
-    include/server/HTTP/session.hpp
-
-    # Route class
-    include/server/route/route.hpp
-
-    # Response class
-    include/server/response/response.hpp
-
-    # Utility functions
-    include/server/utility/utilityFunctions.hpp
+    # Routes
+    include/routes.hpp
+    include/routes/users.hpp
 )
 
 set(

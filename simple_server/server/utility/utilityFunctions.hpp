@@ -1,6 +1,11 @@
 #pragma once
 
+#ifdef _WIN32
+    #define _WIN32_WINNT 0x0601
+#endif
+
 // List of core dependencies
+#include <iostream>
 #include <string>
 #include <cstdint>
 #include <vector>
@@ -19,7 +24,7 @@ namespace filesystem = std::filesystem;		// filesystem
 namespace websocket = beast::websocket;		// from <boost/beast/websocket.hpp>
 
 // Return a reasonable mime type based on the extension of a file.
-beast::string_view mime_type(beast::string_view path) {
+inline beast::string_view mime_type(beast::string_view path) {
     using beast::iequals;
     auto const ext = [&path] {
             auto const pos = path.rfind(".");
@@ -58,7 +63,7 @@ beast::string_view mime_type(beast::string_view path) {
 
 // Append an HTTP rel-path to a local filesystem path.
 // The returned path is normalized for the platform.
-std::string path_cat(beast::string_view base, beast::string_view path) {
+inline std::string path_cat(beast::string_view base, beast::string_view path) {
     if (base.empty())
         return std::string(path);
     std::string result(base);
@@ -80,6 +85,6 @@ std::string path_cat(beast::string_view base, beast::string_view path) {
 }
 
 // Report a failure
-void fail(beast::error_code ec, char const* what) {
+inline void fail(beast::error_code ec, char const* what) {
     std::cerr << what << ": " << ec.message() << "\n";
 }

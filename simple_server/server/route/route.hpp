@@ -1,7 +1,7 @@
 #pragma once
 #include "../response/response.hpp"
 
-namespace bergemon {
+namespace b_net {
 
     enum Type { STR_, INT_, BOOL_ };
 
@@ -168,18 +168,18 @@ namespace bergemon {
 }
 
 // Type of query
-using bergemon::Type::BOOL_;
-using bergemon::Type::INT_;
-using bergemon::Type::STR_;
+using b_net::Type::BOOL_;
+using b_net::Type::INT_;
+using b_net::Type::STR_;
 
 // Methods
-using bergemon::Method::DELETE_;
-using bergemon::Method::GET;
-using bergemon::Method::HEAD;
-using bergemon::Method::PATCH;
-using bergemon::Method::POST;
-using bergemon::Method::PUT;
+using b_net::Method::DELETE_;
+using b_net::Method::GET;
+using b_net::Method::HEAD;
+using b_net::Method::PATCH;
+using b_net::Method::POST;
+using b_net::Method::PUT;
 
 // Parameters for handler prototype
-using bergemon::ParsedQuery;
-using bergemon::Method;
+using b_net::ParsedQuery;
+using b_net::Method;

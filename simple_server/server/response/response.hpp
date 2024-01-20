@@ -1,7 +1,7 @@
 #pragma once
 #include "../utility/utilityFunctions.hpp"
 
-namespace bergemon {
+namespace b_net {
 
     enum BodyType { TEXT, BINARY };
 
@@ -108,5 +108,5 @@ namespace bergemon {
     };
 }
 
-using bergemon::BodyType::BINARY;
-using bergemon::BodyType::TEXT;
+using b_net::BodyType::BINARY;
+using b_net::BodyType::TEXT;

@@ -6,11 +6,11 @@ namespace HandleRequest {
     template <class Body, class Allocator>
     http::message_generator handle_request (
         http::request<Body, http::basic_fields<Allocator>>&& req,
-        std::vector<bergemon::Route>& routes
+        std::vector<b_net::Route>& routes
     )
     {
         for (auto& elem : routes) {
-            using namespace bergemon;
+            using namespace b_net;
 
             if (!elem.isValid(req.target()))
                 return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Illegal request-target");
@@ -19,14 +19,14 @@ namespace HandleRequest {
                 continue;
 
             if (!elem.methodAllowed(req.method()))
-                return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Unknown HTTP-method");
+                return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Method not allowed");
 
             std::list<ParsedQuery> queries_list = elem.parseQueries(req.target());
 
             if(!elem.queriesExist(queries_list))
-                return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Not allowed query parameter");
+                return ErrorCodes::bad_request(req.version(), req.keep_alive(), "Not allowed query parameter(s)");
 
-            bergemon::Response custom_res(
+            b_net::Response custom_res(
                 elem.handler()(
                     req.target(),
                     queries_list,

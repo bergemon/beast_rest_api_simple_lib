@@ -1,8 +1,8 @@
 #pragma once
 #include "../route/route.hpp"
 
-bergemon::Method convertMethod(http::verb method) {
-    using namespace bergemon;
+inline b_net::Method convertMethod(http::verb method) {
+    using namespace b_net;
 
     switch(method) {
         case http::verb::head:
@@ -22,13 +22,13 @@ bergemon::Method convertMethod(http::verb method) {
     }
 }
 
-http::message_generator createResponse(
-    bergemon::Response& r,
+inline http::message_generator createResponse(
+    b_net::Response& r,
     uint32_t version,
     bool keep_alive
 )
 {
-    bergemon::ChildResponse res_(r);
+    b_net::ChildResponse res_(r);
 
     http::response<http::string_body> res{http::status::ok, version};
     res.set(http::field::server, "Rest API by bergemon");

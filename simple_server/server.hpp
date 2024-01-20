@@ -1,7 +1,7 @@
 #pragma once
 #include "server/HTTP/listener.hpp"
 
-namespace bergemon {
+namespace b_net {
     // Server class that can handle request - check routes, queries and make response
     // Constructor: (usigned short port, int threads)
     class Server {
@@ -10,7 +10,7 @@ namespace bergemon {
         std::vector<std::thread> m_threadsArray;
         uint32_t m_threads;
         // routes that would be handled
-        std::vector<bergemon::Route> m_routes;
+        std::vector<b_net::Route> m_routes;
 
     public:
         Server (unsigned short port, int threads)

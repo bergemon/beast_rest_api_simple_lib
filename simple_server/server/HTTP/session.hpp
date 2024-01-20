@@ -7,10 +7,10 @@ namespace Session {
         beast::tcp_stream m_stream;
         beast::flat_buffer m_buffer;
         http::request<http::string_body> m_request;
-        std::vector<bergemon::Route>& m_routes;
+        std::vector<b_net::Route>& m_routes;
 
     public:
-        Session(tcp::socket&& socket, std::vector<bergemon::Route>& routes)
+        Session(tcp::socket&& socket, std::vector<b_net::Route>& routes)
             : m_stream(std::move(socket)), m_routes(routes) { }
 
         void run() {

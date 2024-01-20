@@ -1,6 +1,9 @@
 ﻿#include "../include/dependencies.hpp"
-#include "../include/server.hpp"
+#include "../simple_server/server.hpp"
 #include "include/variables.hpp"
+
+// routes
+#include "../include/routes.hpp"
 
 #define _DEBUG
 
@@ -30,7 +33,7 @@ int main(int argc, char** argv) {
     if (argc > 2)
         threads = std::max<int>(1, std::atoi(argv[2]));
 
-    bergemon::Server server(port, threads);
+    b_net::Server server(port, threads);
 
     server.ROUTE(
         // Allowed methods<enum Method> for this route
@@ -40,31 +43,7 @@ int main(int argc, char** argv) {
         // Queries (query<string>, is_required<bool>, type<enum Type>)
         { {"min", true, INT_}, {"max", true, INT_} },
         // Route handler
-        [&](std::string target, std::list<ParsedQuery>& queries, Method method) {
-            bergemon::Response res;
-
-            int min, max;
-            for (const auto& elem : queries) {
-                if (elem.query() == "min") {
-                    min = std::atoi(elem.value().c_str());
-                }
-                if (elem.query() == "max") {
-                    max = std::atoi(elem.value().c_str());
-                }
-            }
-
-            std::stringstream ss;
-
-            ss << "This is test response!\n"
-                << "Query parameters:\n"
-                << "min = " << min << '\n'
-                << "max = " << max;
-
-            res.body(ss.str());
-            res.bodyType(TEXT);
-
-            return res;
-        }
+        getUsers
     );
 
     server.run();
