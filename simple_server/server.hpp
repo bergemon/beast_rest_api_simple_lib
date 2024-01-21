@@ -27,6 +27,13 @@ namespace b_net {
             m_routes.push_back(Route{ methods, target, queries, handler });
         }
 
+        // Put new route to handle by the server
+        void ROUTE (std::vector<Method> methods, std::string target,
+            std::function<Response(std::string, std::list<ParsedQuery>&, Method)> handler)
+        {
+            m_routes.push_back(Route{ methods, target, {}, handler });
+        }
+
         void run()
         {
             // Run the I/O service on the requested number of threads

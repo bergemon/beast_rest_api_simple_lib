@@ -22,8 +22,8 @@ namespace b_net {
     class Response {
     protected:
         BodyType m_type = BodyType::TEXT;
-        char* m_body;
-        size_t m_size;
+        unsigned char* m_body;
+        size_t m_size = 0;
         std::list<Field> m_setFields;
         std::list<Field> m_insertFields;
 
@@ -41,14 +41,14 @@ namespace b_net {
 
         void initialize(size_t size, const char* body) {
             m_size = size;
-            m_body = new char[size];
+            m_body = new unsigned char[size];
             for (unsigned long long i = 0; i < size; ++i)
             { m_body[i] = body[i]; }
         }
 
-        void initialize(size_t size, char* body) {
+        void initialize(size_t size, unsigned char* body) {
             m_size = size;
-            m_body = new char[size];
+            m_body = new unsigned char[size];
             for (unsigned long long i = 0; i < size; ++i)
             { m_body[i] = body[i]; }
         }
@@ -57,7 +57,8 @@ namespace b_net {
         // default constructor
         Response() { }
         // copying constructor for child class
-        Response(const Response& res) : m_type(res.m_type)
+        Response(const Response& res) : m_type(res.m_type),
+            m_setFields(res.m_setFields), m_insertFields(res.m_insertFields)
         { initialize(res.m_size, res.m_body); }
         // array of chars body
         Response(const char* body) : m_type(BodyType::TEXT)
@@ -68,7 +69,7 @@ namespace b_net {
         // string body
         Response(std::string body) : m_type(BodyType::TEXT)
         { initialize(check(body.c_str()), body.c_str()); }
-        ~Response() { delete[] m_body; }
+        // ~Response() { delete[] m_body; }
 
         // set body type
         void bodyType(BodyType type) { m_type = type; }
@@ -77,6 +78,9 @@ namespace b_net {
         void body(const char* body) { initialize(check(body), body); }
         // const char body
         void body(char* body) { initialize(check(body), body); }
+        // if we need to set size before
+        void body(char* body, size_t size) { initialize(size, body); }
+        void body(const char* body, size_t size) { initialize(size, body); }
         // string body
         void body(std::string body) { initialize(check(body.c_str()), body.c_str()); }
 
@@ -88,15 +92,15 @@ namespace b_net {
         }
     };
 
-    class ChildResponse : private Response {
+    class utility_class : private Response {
     public:
-        ChildResponse(const Response& res)
+        utility_class(const Response& res)
             : Response(res)
         { }
 
         // Getters for handler
         BodyType getType() { return m_type; }
-        char* getBody() { return m_body; }
+        unsigned char* getBody() { return m_body; }
         // Body length
         size_t getSize() { return m_size; }
         // List of fields to set

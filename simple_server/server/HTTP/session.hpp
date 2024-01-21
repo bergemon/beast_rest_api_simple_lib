@@ -1,5 +1,5 @@
 #pragma once
-#include "../requestHandlers/handleRequest.hpp"
+#include "../handleRequest/handleRequest.hpp"
 
 namespace Session {
     // Handles an HTTP server connection

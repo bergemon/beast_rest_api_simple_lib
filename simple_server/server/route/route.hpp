@@ -57,17 +57,23 @@ namespace b_net {
             if (target.find("..") != std::string::npos
                 || target.find("//") != std::string::npos
                 || target.at(0) != '/'
-                || target.length() < 2)
+                || target.length() < 2
+                || target.find("?") > target.find("&")
+                || target.find("&&") != std::string::npos
+                || target.find("??") != std::string::npos)
             { return false; }
 
             return true;
         }
 
-        bool isTarget (const std::string target) {
-            if (m_queries.size() == 0 && target == m_target
-                || m_queries.size() > 0
-                && target.substr(0, target.find("?")) == m_target
-                || target.substr(0, target.length() - 1) == m_target)
+        bool isTarget (std::string target) {
+            // target must be pure - without query parameters
+            if (target.find("?") != std::string::npos)
+                target = target.substr(0, target.find("?"));
+            if (target.at(target.length() - 1) == '/')
+                target = target.substr(0, target.length() - 1);
+
+            if (target == m_target)
             { return true; }
 
             return false;
@@ -76,6 +82,11 @@ namespace b_net {
         std::list<ParsedQuery> parseQueries (const std::string target) {
             std::list<ParsedQuery> queries;
             bool last = false;
+
+            // If there is no query parameters
+            if(target.find("?") == std::string::npos)
+                return {};
+
             std::string tempStr{ target.substr(target.find("?") + 1,
                 target.length() - (target.find("?") + 1)) };
 

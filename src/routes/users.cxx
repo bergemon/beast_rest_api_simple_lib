@@ -16,7 +16,7 @@ b_net::Response getUsers(std::string target, std::list<b_net::ParsedQuery>& quer
 
     std::stringstream ss;
 
-    ss << "This is test response!\n"
+    ss << "Test /users response!\n"
         << "Query parameters:\n"
         << "min = " << min << '\n'
         << "max = " << max;
