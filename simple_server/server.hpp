@@ -22,14 +22,14 @@ namespace b_net {
 
         // Put new route to handle by the server
         void ROUTE (std::vector<Method> methods, std::string target, std::vector<Query> queries,
-            std::function<Response(std::string, std::list<ParsedQuery>&, Method)> handler)
+            std::function<void(Response&, std::string, std::list<ParsedQuery>&, Method)> handler)
         {
             m_routes.push_back(Route{ methods, target, queries, handler });
         }
 
         // Put new route to handle by the server
         void ROUTE (std::vector<Method> methods, std::string target,
-            std::function<Response(std::string, std::list<ParsedQuery>&, Method)> handler)
+            std::function<void(Response&, std::string, std::list<ParsedQuery>&, Method)> handler)
         {
             m_routes.push_back(Route{ methods, target, {}, handler });
         }

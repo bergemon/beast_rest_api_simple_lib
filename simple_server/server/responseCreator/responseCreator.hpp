@@ -28,23 +28,23 @@ inline http::message_generator createResponse(
     bool keep_alive
 )
 {
-    b_net::utility_class res_(r);
+    b_net::utility_class res_;
 
     // Response type - text
-    if (res_.getSize() && res_.getType() == b_net::BodyType::TEXT)
+    if (res_.getSize(r) && res_.getType(r) == b_net::BodyType::TEXT)
     {
         http::response<http::string_body> res{http::status::ok, version};
         res.set(http::field::server, "Rest API by bergemon");
         res.set(http::field::content_type, "text/plain");
         res.keep_alive(keep_alive);
-        res.body() = reinterpret_cast<char*>(res_.getBody());
-        res.content_length(res_.getSize());
+        res.body() = reinterpret_cast<char*>(res_.getBody(r));
+        res.content_length(res_.getSize(r));
         // Loop for all fields that we must set into http header
-        for (const auto& elem : res_.getSetFields()) {
+        for (const auto& elem : res_.getSetFields(r)) {
             res.set(elem.getName(), elem.getValue());
         }
         // Loop for all fields that we must insert into http header
-        for (const auto& elem : res_.getInsertFields()) {
+        for (const auto& elem : res_.getInsertFields(r)) {
             res.insert(elem.getName(), elem.getValue());
         }
         res.prepare_payload();
@@ -52,24 +52,24 @@ inline http::message_generator createResponse(
     }
 
     // Response type - binary
-    if (res_.getSize() && res_.getType() == b_net::BodyType::BINARY)
+    if (res_.getSize(r) && res_.getType(r) == b_net::BodyType::BINARY)
     {
         http::response<http::buffer_body> res{http::status::ok, version};
         res.set(http::field::server, "Rest API by bergemon");
         // res.set(http::field::content_type, "text/html; charset=windows-1251");
-        res.set(http::field::content_type, "image/png");
+        res.set(http::field::content_type, "image/jpeg");
         // res.set(http::field::content_type, "application/octet-stream");
-        res.body().data = res_.getBody();
-        res.body().size = res_.getSize();
+        res.body().data = res_.getBody(r);
+        res.body().size = res_.getSize(r);
         res.body().more = false;
         res.keep_alive(keep_alive);
-        res.content_length(res_.getSize());
+        res.content_length(res_.getSize(r));
         // Loop for all fields that we must set into http header
-        for (const auto& elem : res_.getSetFields()) {
+        for (const auto& elem : res_.getSetFields(r)) {
             res.set(elem.getName(), elem.getValue());
         }
         // Loop for all fields that we must insert into http header
-        for (const auto& elem : res_.getInsertFields()) {
+        for (const auto& elem : res_.getInsertFields(r)) {
             res.insert(elem.getName(), elem.getValue());
         }
         return res;
@@ -81,14 +81,13 @@ inline http::message_generator createResponse(
     res.set(http::field::content_type, "text/plain");
     res.keep_alive(keep_alive);
     // Loop for all fields that we must set into http header
-    for (const auto& elem : res_.getSetFields()) {
+    for (const auto& elem : res_.getSetFields(r)) {
         res.set(elem.getName(), elem.getValue());
     }
     // Loop for all fields that we must insert into http header
-    for (const auto& elem : res_.getInsertFields()) {
+    for (const auto& elem : res_.getInsertFields(r)) {
         res.insert(elem.getName(), elem.getValue());
     }
     res.prepare_payload();
     return res;
-    
 }

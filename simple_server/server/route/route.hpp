@@ -40,14 +40,14 @@ namespace b_net {
         // Route handler
         const std::function
             // handler prototype
-            <Response(std::string, std::list<ParsedQuery>&, Method)>
+            <void(Response&, std::string, std::list<ParsedQuery>&, Method)>
             m_handler;
 
     public:
         Route(const std::vector<Method> methods, const std::string target, const std::vector<Query> queries,
             const std::function
                 // handler prototype
-                <Response(std::string, std::list<ParsedQuery>&, Method)>
+                <void(Response&, std::string, std::list<ParsedQuery>&, Method)>
                 handler
         )
             : m_methods(methods), m_target(target), m_queries(queries), m_handler(handler)
@@ -170,7 +170,7 @@ namespace b_net {
 
         const std::function
             // handler prototype
-            <Response(std::string, std::list<ParsedQuery>&, Method)>
+            <void(Response&, std::string, std::list<ParsedQuery>&, Method)>
         handler() const
         {
             return m_handler;

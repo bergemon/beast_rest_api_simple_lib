@@ -8,6 +8,7 @@ namespace Session {
         beast::flat_buffer m_buffer;
         http::request<http::string_body> m_request;
         std::vector<b_net::Route>& m_routes;
+        b_net::Response m_custom_response;
 
     public:
         Session(tcp::socket&& socket, std::vector<b_net::Route>& routes)
@@ -35,7 +36,13 @@ namespace Session {
             if (ec)
                 return fail(ec, "read");
 
-            send_response(HandleRequest::handle_request(std::move(m_request), m_routes));
+            send_response(
+                HandleRequest::handle_request(
+                    m_custom_response,
+                    std::move(m_request),
+                    m_routes
+                )
+            );
         }
 
         void send_response(http::message_generator&& msg) {
@@ -61,6 +68,14 @@ namespace Session {
         void do_close() {
             beast::error_code ec;
             m_stream.socket().shutdown(tcp::socket::shutdown_send, ec);
+        }
+
+        // Custom response class with data to transmit
+        void set_response(b_net::Response& response) {
+            m_custom_response = response;
+        }
+        b_net::Response& get_response() {
+            return m_custom_response;
         }
     };
 }

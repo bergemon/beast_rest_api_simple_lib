@@ -47,25 +47,27 @@ int main(int argc, char** argv) {
         "/image",
         // Route handler
         [&](
+            b_net::Response& res,
             std::string target,
             std::list<b_net::ParsedQuery>& queries,
             b_net::Method method
         ) {
-            b_net::Response res;
+            std::ifstream file("image.jpg", std::ios::ate | std::ios::binary);
+            std::streamsize size = 0;
+            char* buffer = nullptr;
 
-            std::ifstream file("image.png", std::ios::ate | std::ios::binary);
-            file.seekg( 0, std::ios::end );
-            std::streamsize size = file.tellg();
-            file.seekg( 0, std::ios::beg );
-            char* buffer = new char[size];
-            if (file.is_open())
-                file.read(buffer, size);
+            if (file.is_open()) {
+                file.seekg( 0, std::ios::end );
+                size = file.tellg();
+                file.seekg( 0, std::ios::beg );
+                if (size > 0) {
+                    buffer = new char[size];
+                    file.read(buffer, size);
+                }
+            }
             file.close();
 
-            res.body(buffer, size);
-            res.bodyType(BINARY);
-
-            return res;
+            res.body(buffer, size, BINARY);
         }
     );
 
@@ -78,11 +80,11 @@ int main(int argc, char** argv) {
         { {"min", true, INT_}, {"max", true, INT_} },
         // Route handler
         [&](
+            b_net::Response& res,
             std::string target,
             std::list<b_net::ParsedQuery>& queries,
             b_net::Method method
         ) {
-            b_net::Response res;
             std::stringstream ss;
             int min, max;
 
@@ -97,10 +99,7 @@ int main(int argc, char** argv) {
                 << "Min: " << min
                 << ", Max: " << max << std::endl;
 
-            res.body(ss.str().c_str(), ss.str().length() - 1);
-            res.bodyType(BINARY);
-
-            return res;
+            res.body(ss.str().c_str(), ss.str().length(), BINARY);
         }
     );
 

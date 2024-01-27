@@ -4,6 +4,7 @@
 namespace HandleRequest {
     template <class Body, class Allocator>
     http::message_generator handle_request (
+        b_net::Response& res,
         http::request<Body, http::basic_fields<Allocator>>&& req,
         std::vector<b_net::Route>& routes
     )
@@ -60,15 +61,14 @@ namespace HandleRequest {
             if(!elem.queriesExist(queries_list))
                 return bad_request("Bad request. Not allowed query parameter(s)");
 
-            b_net::Response custom_res(
-                elem.handler()(
-                    req.target(),
-                    queries_list,
-                    convertMethod(req.method())
-                )
+            elem.handler()(
+                res,
+                req.target(),
+                queries_list,
+                convertMethod(req.method())
             );
 
-            return createResponse(custom_res, req.version(), req.keep_alive());
+            return createResponse(res, req.version(), req.keep_alive());
         }
 
         // If there is no such requested target

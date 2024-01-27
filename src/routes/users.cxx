@@ -1,9 +1,12 @@
 #include "../../include/routes.hpp"
 
-b_net::Response getUsers(std::string target, std::list<b_net::ParsedQuery>& queries, b_net::Method method) {
-
-    b_net::Response res;
-
+void getUsers(
+    b_net::Response& res,
+    std::string target,
+    std::list<b_net::ParsedQuery>& queries,
+    b_net::Method method
+)
+{
     int min, max;
     for (const auto& elem : queries) {
         if (elem.query() == "min") {
@@ -22,7 +25,4 @@ b_net::Response getUsers(std::string target, std::list<b_net::ParsedQuery>& quer
         << "max = " << max;
 
     res.body(ss.str());
-    res.bodyType(TEXT);
-
-    return res;
 }
