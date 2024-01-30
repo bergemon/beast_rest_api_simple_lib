@@ -15,25 +15,25 @@ namespace Listener {
 
             m_acceptor.open(endpoint.protocol(), ec);
             if (ec) {
-                fail(ec, "open");
+                utility_::fail(ec, "open");
                 return;
             }
 
             m_acceptor.set_option(asio::socket_base::reuse_address(true), ec);
             if (ec) {
-                fail(ec, "set_option");
+                utility_::fail(ec, "set_option");
                 return;
             }
 
             m_acceptor.bind(endpoint, ec);
             if (ec) {
-                fail(ec, "bind");
+                utility_::fail(ec, "bind");
                 return;
             }
 
             m_acceptor.listen(asio::socket_base::max_listen_connections, ec);
             if (ec) {
-                fail(ec, "listen");
+                utility_::fail(ec, "listen");
                 return;
             }
         } // End of constructor
@@ -48,7 +48,7 @@ namespace Listener {
 
         void on_accept(beast::error_code ec, tcp::socket socket) {
             if (ec) {
-                fail(ec, "accept");
+                utility_::fail(ec, "accept");
                 return;
             }
             else

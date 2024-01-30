@@ -14,6 +14,8 @@ namespace Session {
         Session(tcp::socket&& socket, std::vector<b_net::Route>& routes)
             : m_stream(std::move(socket)), m_routes(routes) { }
 
+        ~Session() { m_custom_response.clear(); }
+
         void run() {
             asio::dispatch(m_stream.get_executor(),
                 beast::bind_front_handler(&Session::do_read, shared_from_this()));
@@ -34,7 +36,7 @@ namespace Session {
                 return do_close();
 
             if (ec)
-                return fail(ec, "read");
+                return utility_::fail(ec, "read");
 
             send_response(
                 HandleRequest::handle_request(
@@ -57,7 +59,7 @@ namespace Session {
             boost::ignore_unused(bytes_transferred);
 
             if (ec)
-                return fail(ec, "write");
+                return utility_::fail(ec, "write");
 
             if (!keep_alive)
                 return do_close();

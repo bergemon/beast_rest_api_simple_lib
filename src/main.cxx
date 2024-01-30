@@ -47,58 +47,43 @@ int main(int argc, char** argv) {
         "/image",
         // Route handler
         [&](
-            b_net::Response& res,
-            std::string target,
-            std::list<b_net::ParsedQuery>& queries,
-            b_net::Method method
+            b_net::Request& req,
+            b_net::Response& res
         ) {
-            std::ifstream file("image.jpg", std::ios::ate | std::ios::binary);
-            std::streamsize size = 0;
-            char* buffer = nullptr;
-
-            if (file.is_open()) {
-                file.seekg( 0, std::ios::end );
-                size = file.tellg();
-                file.seekg( 0, std::ios::beg );
-                if (size > 0) {
-                    buffer = new char[size];
-                    file.read(buffer, size);
-                }
+            b_net::error_code ec = res.file_body("image2.png");
+            if (ec.get_status() != b_net::status::OK) {
+                std::cerr << ec.message() << std::endl;
             }
-            file.close();
-
-            res.body(buffer, size, BINARY);
         }
     );
 
     server.ROUTE(
         // Allowed methods<enum Method> for this route
-        { GET, HEAD },
+        { ALL, GET, HEAD },
         // Route target<string>
         "/test",
         // Queries (query<string>, is_required<bool>, type<enum Type>)
-        { {"min", true, INT_}, {"max", true, INT_} },
+        {
+            {"min", false, INT_},
+            {"max", false, INT_},
+            {"test", false, INT_},
+            {"hello", false, INT_}
+        },
         // Route handler
         [&](
-            b_net::Response& res,
-            std::string target,
-            std::list<b_net::ParsedQuery>& queries,
-            b_net::Method method
+            b_net::Request& req,
+            b_net::Response& res
         ) {
             std::stringstream ss;
-            int min, max;
-
-            for (const auto& elem : queries) {
-                if (elem.query() == "min")
-                    min = std::atoi(elem.value().c_str());
-                if (elem.query() == "max")
-                    max = std::atoi(elem.value().c_str());
+            std::error_code ec;
+            ss << "This is test binary response!\n";
+            for (auto& elem : req.queries()) {
+                if (elem.query() != req.queries().back().query()) {
+                    ss << elem.query() << ": " << elem.value() << '\n';
+                    continue;
+                }
+                ss << elem.query() << ": " << elem.value();
             }
-
-            ss << "This is test binary response!\n"
-                << "Min: " << min
-                << ", Max: " << max << std::endl;
-
             res.body(ss.str().c_str(), ss.str().length(), BINARY);
         }
     );

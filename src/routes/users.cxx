@@ -1,14 +1,12 @@
 #include "../../include/routes.hpp"
 
 void getUsers(
-    b_net::Response& res,
-    std::string target,
-    std::list<b_net::ParsedQuery>& queries,
-    b_net::Method method
+    b_net::Request& req,
+    b_net::Response& res
 )
 {
     int min, max;
-    for (const auto& elem : queries) {
+    for (const auto& elem : req.queries()) {
         if (elem.query() == "min") {
             min = std::atoi(elem.value().c_str());
         }

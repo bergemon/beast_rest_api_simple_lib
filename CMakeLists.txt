@@ -27,7 +27,10 @@ set (
     simple_server/server/HTTP/session.hpp
     simple_server/server/route/route.hpp
     simple_server/server/response/response.hpp
+    simple_server/server/request/request.hpp
     simple_server/server/utility/utilityFunctions.hpp
+    simple_server/server/sharedData/sharedData.hpp
+    simple_server/server/sharedData/error_code.hpp
 
     # Project general dependencies
     include/dependencies.hpp

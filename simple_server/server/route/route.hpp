@@ -1,12 +1,7 @@
 #pragma once
-#include "../response/response.hpp"
+#include "../request/request.hpp"
 
 namespace b_net {
-
-    enum Type { STR_, INT_, BOOL_ };
-
-    enum Method { HEAD, GET, POST, PUT, DELETE_, PATCH };
-
     class Query {
         const std::string m_query;
         const bool m_required;
@@ -22,36 +17,35 @@ namespace b_net {
         bool isRequired () const { return m_required; }
     };
 
-    class ParsedQuery {
-        const std::string m_query;
-        const std::string m_value;
-        
-    public:
-        ParsedQuery(std::string query, std::string value)
-            : m_query(query), m_value(value) {}
-        std::string query() const { return m_query; }
-        std::string value() const { return m_value; }
-    };
-
     class Route {
+        const bool m_all_methods;
         const std::vector<Method> m_methods;
         const std::string m_target;
         const std::vector<Query> m_queries;
         // Route handler
         const std::function
             // handler prototype
-            <void(Response&, std::string, std::list<ParsedQuery>&, Method)>
+            <void(Request&, Response&)>
             m_handler;
 
     public:
         Route(const std::vector<Method> methods, const std::string target, const std::vector<Query> queries,
             const std::function
                 // handler prototype
-                <void(Response&, std::string, std::list<ParsedQuery>&, Method)>
+                <void(Request&, Response&)>
                 handler
         )
-            : m_methods(methods), m_target(target), m_queries(queries), m_handler(handler)
+            : m_methods(methods), m_target(target),
+            m_queries(queries), m_handler(handler),
+            m_all_methods(hasAllMethod())
         { }
+
+        bool hasAllMethod() {
+            for (const auto& elem : m_methods) {
+                if(elem == Method::ALL) { return true; }
+            }
+            return false;
+        }
 
         bool isValid (const std::string target = "0") {
             if (target.find("..") != std::string::npos
@@ -77,39 +71,6 @@ namespace b_net {
             { return true; }
 
             return false;
-        }
-
-        std::list<ParsedQuery> parseQueries (const std::string target) {
-            std::list<ParsedQuery> queries;
-            bool last = false;
-
-            // If there is no query parameters
-            if(target.find("?") == std::string::npos)
-                return {};
-
-            std::string tempStr{ target.substr(target.find("?") + 1,
-                target.length() - (target.find("?") + 1)) };
-
-            while(tempStr.find("&") != std::string::npos || last == false) {
-                if (tempStr.find("&") == std::string::npos) { last = true; }
-
-                if (last == false) {
-                    queries.push_back({
-                        tempStr.substr(0, tempStr.find("=")),
-                        tempStr.substr(tempStr.find("=") + 1, tempStr.find("&") - (tempStr.find("=") + 1))
-                    });
-                    tempStr =
-                        tempStr.substr(tempStr.find("&") + 1, tempStr.length() - (tempStr.find("&") + 1));
-                }
-                else {
-                    queries.push_back({
-                        tempStr.substr(0, tempStr.find("=")),
-                        tempStr.substr(tempStr.find("=") + 1, tempStr.length() - (tempStr.find("=") + 1))
-                    });
-                }
-            }
-
-            return queries;
         }
 
         bool queriesExist (const std::list<ParsedQuery> parsed_queries) {
@@ -150,6 +111,8 @@ namespace b_net {
         }
 
         bool methodAllowed (const http::verb method) {
+            if (m_all_methods) { return true; }
+
             for (const auto& elem : m_methods) {
                 if (elem == Method::HEAD && method == http::verb::head)
                     return true;
@@ -170,27 +133,10 @@ namespace b_net {
 
         const std::function
             // handler prototype
-            <void(Response&, std::string, std::list<ParsedQuery>&, Method)>
+            <void(Request&, Response&)>
         handler() const
         {
             return m_handler;
         }
     };
 }
-
-// Type of query
-using b_net::Type::BOOL_;
-using b_net::Type::INT_;
-using b_net::Type::STR_;
-
-// Methods
-using b_net::Method::DELETE_;
-using b_net::Method::GET;
-using b_net::Method::HEAD;
-using b_net::Method::PATCH;
-using b_net::Method::POST;
-using b_net::Method::PUT;
-
-// Parameters for handler prototype
-using b_net::ParsedQuery;
-using b_net::Method;

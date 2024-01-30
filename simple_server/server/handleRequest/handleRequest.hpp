@@ -43,6 +43,9 @@ namespace HandleRequest {
             return res;
         };
 
+        std::cout << req.body() << std::endl;
+        std::cout << req.base() << std::endl;
+
         // Handle incoming request
         for (auto& elem : routes) {
             using namespace b_net;
@@ -56,17 +59,18 @@ namespace HandleRequest {
             if (!elem.methodAllowed(req.method()))
                 return bad_request("Bad request. Method not allowed");
 
-            std::list<ParsedQuery> queries_list = elem.parseQueries(req.target());
+            // Construct custom b_net request class for the handler
+            b_net::Request req_(
+                req.target(),
+                utility_::parseQueries(req.target()),
+                utility_::convertMethod(req.method())
+            );
 
-            if(!elem.queriesExist(queries_list))
+            if(!elem.queriesExist(req_.queries()))
                 return bad_request("Bad request. Not allowed query parameter(s)");
 
-            elem.handler()(
-                res,
-                req.target(),
-                queries_list,
-                convertMethod(req.method())
-            );
+            // Invoke route handler and get custom b_net response class
+            elem.handler()(req_, res.clear());
 
             return createResponse(res, req.version(), req.keep_alive());
         }
@@ -77,22 +81,5 @@ namespace HandleRequest {
             res_string = res_string.substr(0, res_string.find("?"));
 
         return not_found(res_string);
-
-        // Build the path to the requested file
-        // std::string path = path_cat(".", req.target());
-        // if (req.target().back() == '/')
-        //     path.append("index.html");
-
-        // Attempt to open the file
-        // beast::error_code ec;
-        // http::file_body::value_type body;
-        // body.open(path.c_str(), beast::file_mode::scan, ec);
-
-        // Handle an unknown error
-        // if(ec)
-        //     return ErrorCodes::server_error(req.version(), req.keep_alive(), ec.message());
-
-        // Cache the size since we need it after the move
-        // auto const size = body.size();
     }
 }
