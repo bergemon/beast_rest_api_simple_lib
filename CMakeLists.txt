@@ -23,17 +23,6 @@ set (
     # Simple server lib
     simple_server/server.hpp
     simple_server/net_handler.hpp
-    simple_server/server/HTTP/listener.hpp
-    simple_server/server/HTTP/session.hpp
-    simple_server/server/route/route.hpp
-    simple_server/server/response/response.hpp
-    simple_server/server/request/request.hpp
-    simple_server/server/sharedData/sharedData.hpp
-    simple_server/server/sharedData/sharedFunctions.hpp
-    simple_server/server/sharedData/error_code.hpp
-    simple_server/server/utility/request_utility_funcs.hpp
-    simple_server/server/utility/response_utility_funcs.hpp
-    simple_server/server/utility/utilityFunctions.hpp
 
     # Project general dependencies
     include/dependencies.hpp

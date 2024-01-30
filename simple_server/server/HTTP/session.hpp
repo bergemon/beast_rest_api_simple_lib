@@ -16,12 +16,14 @@ namespace Session {
 
         ~Session() { m_custom_response.clear(); }
 
-        void run() {
+        void run()
+        {
             asio::dispatch(m_stream.get_executor(),
                 beast::bind_front_handler(&Session::do_read, shared_from_this()));
         }
 
-        void do_read() {
+        void do_read()
+        {
             m_request = {};
             m_stream.expires_after(std::chrono::seconds(30));
 
@@ -29,7 +31,8 @@ namespace Session {
                 beast::bind_front_handler(&Session::on_read, shared_from_this()));
         }
 
-        void on_read(beast::error_code ec, std::size_t bytes_transferred) {
+        void on_read(beast::error_code ec, std::size_t bytes_transferred)
+        {
             boost::ignore_unused(bytes_transferred);
 
             if (ec == http::error::end_of_stream)
@@ -47,15 +50,16 @@ namespace Session {
             );
         }
 
-        void send_response(http::message_generator&& msg) {
+        void send_response(http::message_generator&& msg)
+        {
             bool keep_alive = msg.keep_alive();
 
             beast::async_write(m_stream, std::move(msg),
                 beast::bind_front_handler(&Session::on_write, shared_from_this(), keep_alive));
         }
 
-        void on_write(bool keep_alive, beast::error_code ec, std::size_t bytes_transferred) {
-
+        void on_write(bool keep_alive, beast::error_code ec, std::size_t bytes_transferred)
+        {
             boost::ignore_unused(bytes_transferred);
 
             if (ec)
@@ -67,16 +71,15 @@ namespace Session {
             do_read();
         }
 
-        void do_close() {
+        void do_close()
+        {
             beast::error_code ec;
             m_stream.socket().shutdown(tcp::socket::shutdown_send, ec);
         }
 
         // Custom response class with data to transmit
-        void set_response(b_net::Response& response) {
-            m_custom_response = response;
-        }
-        b_net::Response& get_response() {
+        b_net::Response& get_response()
+        {
             return m_custom_response;
         }
     };

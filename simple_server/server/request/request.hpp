@@ -19,6 +19,7 @@ namespace b_net {
             m_method(method), m_cookies(cookies)
         { }
 
+        // Request getters
         std::string target() const { return m_target; }
         const std::list<ParsedQuery>& queries() const { return m_queries; }
         const std::list<ParsedCookie>& cookies() const { return m_cookies; }

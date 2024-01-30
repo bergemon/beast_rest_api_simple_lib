@@ -41,18 +41,23 @@ namespace Listener {
         void run() { do_accept(); }
 
     private:
-        void do_accept() {
+        void do_accept()
+        {
             m_acceptor.async_accept(asio::make_strand(m_context),
                 beast::bind_front_handler(&Listener::on_accept, shared_from_this()));
         }
 
-        void on_accept(beast::error_code ec, tcp::socket socket) {
-            if (ec) {
+        void on_accept(beast::error_code ec, tcp::socket socket)
+        {
+            if (ec)
+            {
                 utility_::fail(ec, "accept");
                 return;
             }
             else
+            {
                 std::make_shared<Session::Session>(std::move(socket), m_routes)->run();
+            }
 
             do_accept();
         }

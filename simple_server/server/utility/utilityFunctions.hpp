@@ -8,7 +8,8 @@ namespace utility_ {
     // Append an HTTP rel-path to a local filesystem path.
     // The returned path is normalized for the platform.
     //////////////////////////////////////////////////////////////////////
-    inline std::string path_cat(beast::string_view base, beast::string_view path) {
+    std::string path_cat(beast::string_view base, beast::string_view path)
+    {
         if (base.empty())
             return std::string(path);
         std::string result(base);
@@ -32,7 +33,8 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Report a failure
     //////////////////////////////////////////////////////////////////////
-    inline void fail(beast::error_code ec, char const* what) {
+    void fail(beast::error_code ec, char const* what)
+    {
         std::cerr << what << ": " << ec.message() << "\n";
     }
 }

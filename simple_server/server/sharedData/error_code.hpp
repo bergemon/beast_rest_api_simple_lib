@@ -26,6 +26,8 @@ namespace b_net {
                 m_message[i] = str[i];
             }
         }
+
+        // Getters
         status get_status() const { return m_status; }
         const char* message() const { return m_message; }
     };

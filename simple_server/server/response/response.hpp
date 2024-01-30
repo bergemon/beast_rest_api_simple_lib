@@ -28,14 +28,16 @@ namespace b_net {
         std::list<Field> m_insertFields;
         std::string m_contentType;
 
-        size_t check(const char* body = nullptr) {
+        size_t check(const char* body = nullptr)
+        {
             uint64_t counter = 0;
             if (body == nullptr) return counter;
 
             while(body[counter] != '\0') { ++counter; }
             return ++counter;
         }
-        size_t check(char* body = nullptr) {
+        size_t check(char* body = nullptr)
+        {
             uint64_t counter = 0;
             if (body == nullptr) return counter;
 
@@ -43,7 +45,8 @@ namespace b_net {
             return ++counter;
         }
 
-        void initialize(size_t size, const char* body) {
+        void initialize(size_t size, const char* body)
+        {
             m_size = size;
             if(m_size > 0) m_body = new unsigned char[size];
             else m_body = nullptr;
@@ -52,7 +55,8 @@ namespace b_net {
             { m_body[i] = body[i]; }
         }
 
-        void initialize(size_t size, unsigned char* body) {
+        void initialize(size_t size, unsigned char* body)
+        {
             m_size = size;
             if(m_size > 0) m_body = new unsigned char[size];
             else m_body = nullptr;
@@ -66,7 +70,8 @@ namespace b_net {
         // instead of doing it in these class
         // to avoid of double freeing memory
         // Or if you want to erase class from everywhere else
-        Response& clear() {
+        Response& clear()
+        {
             delete[] m_body;
             m_body = nullptr;
             m_size = 0;
@@ -77,35 +82,30 @@ namespace b_net {
         }
 
         // const char body
-        void body(const char* body) {
+        void body(const char* body)
+        {
             initialize(check(body), body);
             m_type = TEXT;
         }
         // array of chars body
-        void body(char* body) {
+        void body(char* body)
+        {
             initialize(check(body), body);
             m_type = TEXT;
         }
         // string body
-        void body(std::string body) {
+        void body(std::string body)
+        {
             initialize(body.length() + 1, body.c_str());
             m_type = TEXT;
         }
         // For binary body. You need to point number of body octets.
-        void body(
-            char* body,
-            size_t size,
-            BodyType type = TEXT
-        )
+        void body(char* body, size_t size, BodyType type = BINARY)
         {
             initialize(size, body);
             m_type = type;
         }
-        void body(
-            const char* body,
-            size_t size,
-            BodyType type = TEXT
-        )
+        void body(const char* body, size_t size, BodyType type = BINARY)
         {
             initialize(size, body);
             m_type = type;
@@ -115,7 +115,8 @@ namespace b_net {
         {
             std::filesystem::path p(path);
 
-            if (!std::filesystem::exists(p)) {
+            if (!std::filesystem::exists(p))
+            {
                 return b_net::error_code
                     (b_net::status::FILE_NOT_FOUND, "File not found");
             }
@@ -124,7 +125,8 @@ namespace b_net {
             unsigned char* data_ptr = nullptr;
             size_t file_size = 0;
 
-            if (file.is_open()) {
+            if (file.is_open())
+            {
                 file.seekg(0, std::ios::end);
                 file_size = file.tellg();
                 file.seekg(0, std::ios::beg);
@@ -132,7 +134,8 @@ namespace b_net {
                 file.read(reinterpret_cast<char*>(data_ptr), file_size);
                 file.close();
             }
-            else {
+            else
+            {
                 return b_net::error_code
                     (b_net::status::CANT_OPEN_FILE, "Can't open the file");
             }
@@ -145,18 +148,24 @@ namespace b_net {
                 (b_net::status::OK, "Body was filled with the file octets");
         }
 
-        void set(std::string name, std::string value) {
+        void set(std::string name, std::string value)
+        {
             m_setFields.push_back(Field(name, value));
         }
-        void insert(std::string name, std::string value) {
+        void insert(std::string name, std::string value)
+        {
             m_insertFields.push_back(Field(name, value));
         }
 
         // Set content type for binary file
         void content_type(const char* text)
-        { m_setFields.push_back(Field("Content-Type", text)); }
+        {
+            m_setFields.push_back(Field("Content-Type", text));
+        }
         void content_type(std::string text)
-        { m_setFields.push_back(Field("Content-Type", text)); }
+        {
+            m_setFields.push_back(Field("Content-Type", text));
+        }
 
         friend class utility_class;
     };

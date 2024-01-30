@@ -4,9 +4,10 @@
 namespace b_net {
     // Server class that can handle request - check routes, queries and make response
     // Constructor: (usigned short port, int threads)
+    using Listener::Listener;
     class Server {
         const std::shared_ptr<asio::io_context> m_context;
-        std::shared_ptr<Listener::Listener> m_listener;
+        std::shared_ptr<Listener> m_listener;
         std::vector<std::thread> m_threadsArray;
         uint32_t m_threads;
         // routes that would be handled
@@ -15,7 +16,7 @@ namespace b_net {
     public:
         Server (unsigned short port, int threads)
             : m_context(std::make_shared<asio::io_context>(threads)), m_threads(threads),
-            m_listener(std::make_shared<Listener::Listener>(*m_context, tcp::endpoint{ tcp::v4(), port }, m_routes))
+            m_listener(std::make_shared<Listener>(*m_context, tcp::endpoint{ tcp::v4(), port }, m_routes))
         { }
 
         // Put new route to handle by the server

@@ -1,7 +1,7 @@
 #pragma once
 #include "../utility/utilityFunctions.hpp"
 
-inline http::message_generator createResponse(
+http::message_generator createResponse(
     b_net::Response& r,
     uint32_t version,
     bool keep_alive
@@ -18,10 +18,14 @@ inline http::message_generator createResponse(
         [[nodiscard]] size_t getSize() { return m_size; }
         // List of fields to set
         [[nodiscard]] std::list<b_net::Field>& getSetFields()
-        { return m_setFields; }
+        {
+            return m_setFields;
+        }
         // List of field to insert
         [[nodiscard]] std::list<b_net::Field>& getInsertFields()
-        { return m_insertFields; }
+        {
+            return m_insertFields;
+        }
     };
     utility_class res_(r);
 
@@ -35,11 +39,13 @@ inline http::message_generator createResponse(
         res.body() = reinterpret_cast<char*>(res_.getBody());
         res.content_length(res_.getSize());
         // Loop for all fields that we must set into http header
-        for (const auto& elem : res_.getSetFields()) {
+        for (const auto& elem : res_.getSetFields())
+        {
             res.set(elem.getName(), elem.getValue());
         }
         // Loop for all fields that we must insert into http header
-        for (const auto& elem : res_.getInsertFields()) {
+        for (const auto& elem : res_.getInsertFields())
+        {
             res.insert(elem.getName(), elem.getValue());
         }
         res.prepare_payload();
@@ -57,11 +63,13 @@ inline http::message_generator createResponse(
         res.keep_alive(keep_alive);
         res.content_length(res_.getSize());
         // Loop for all fields that we must set into http header
-        for (const auto& elem : res_.getSetFields()) {
+        for (const auto& elem : res_.getSetFields())
+        {
             res.set(elem.getName(), elem.getValue());
         }
         // Loop for all fields that we must insert into http header
-        for (const auto& elem : res_.getInsertFields()) {
+        for (const auto& elem : res_.getInsertFields())
+        {
             res.insert(elem.getName(), elem.getValue());
         }
         return res;
@@ -73,11 +81,13 @@ inline http::message_generator createResponse(
     res.set(http::field::content_type, "text/plain");
     res.keep_alive(keep_alive);
     // Loop for all fields that we must set into http header
-    for (const auto& elem : res_.getSetFields()) {
+    for (const auto& elem : res_.getSetFields())
+    {
         res.set(elem.getName(), elem.getValue());
     }
     // Loop for all fields that we must insert into http header
-    for (const auto& elem : res_.getInsertFields()) {
+    for (const auto& elem : res_.getInsertFields())
+    {
         res.insert(elem.getName(), elem.getValue());
     }
     res.prepare_payload();

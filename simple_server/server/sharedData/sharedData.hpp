@@ -39,6 +39,7 @@ namespace b_net {
     public:
         ParsedQuery(std::string query, std::string value)
             : m_query(query), m_value(value) {}
+        // Getters
         std::string query() const { return m_query; }
         std::string value() const { return m_value; }
     };
@@ -51,6 +52,7 @@ namespace b_net {
     public:
         ParsedCookie(std::string name, std::string value)
             : m_name(name), m_value(value) {}
+        // Getters
         std::string name() const { return m_name; }
         std::string value() const { return m_value; }
     };

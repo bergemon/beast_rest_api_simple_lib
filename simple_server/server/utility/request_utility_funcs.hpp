@@ -5,8 +5,7 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Parse queries and it's values from request
     //////////////////////////////////////////////////////////////////////
-    inline
-        std::list<ParsedQuery>&
+    std::list<ParsedQuery>&
         parseQueries
         (const std::string target, std::list<ParsedQuery>& l)
     {
@@ -21,8 +20,8 @@ namespace utility_ {
             )
         };
 
-        while(q_str.find("&") != std::string::npos) {
-
+        while(q_str.find("&") != std::string::npos) 
+        {
             l.push_back({
                 q_str.substr(0, q_str.find("=")),
                 q_str.substr(q_str.find("=") + 1, q_str.find("&") - (q_str.find("=") + 1))
@@ -43,10 +42,12 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Convert beast request method to custom b_net::Method
     //////////////////////////////////////////////////////////////////////
-    inline b_net::Method convertMethod(http::verb method) {
+    b_net::Method convertMethod(http::verb method)
+    {
         using namespace b_net;
 
-        switch(method) {
+        switch(method)
+        {
             case http::verb::head:
                 return Method::HEAD;
             case http::verb::get:
@@ -68,15 +69,14 @@ namespace utility_ {
     // Parse cookies from the string
     //////////////////////////////////////////////////////////////////////
     template<bool isRequest, class Fields>
-    inline
         std::string&
         get_cookie_field
         (http::header<isRequest, Fields>& header, std::string& str)
     {
-        for (const auto& elem : header) {
-            if (elem.name_string() == "Cookie") {
+        for (const auto& elem : header)
+        {
+            if (elem.name_string() == "Cookie")
                 str = elem.value();
-            }
         }
         return str;
     }
@@ -84,12 +84,12 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Parse cookies from the string
     //////////////////////////////////////////////////////////////////////
-    // inline
         std::list<b_net::ParsedCookie>&
         parse_cookies
         (std::string cookies, std::list<b_net::ParsedCookie>& l)
     {
-        while (cookies.find(";") != std::string::npos) {
+        while (cookies.find(";") != std::string::npos)
+        {
             l.push_back({
                 cookies.substr(0, cookies.find("=")),
                 cookies.substr(
