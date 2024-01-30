@@ -1,5 +1,5 @@
 #pragma once
-#include "../utility/utilityFunctions.hpp"
+#include "../request/request.hpp"
 
 namespace b_net {
 
@@ -111,7 +111,7 @@ namespace b_net {
             m_type = type;
         }
         // file body, write a path to the file
-        b_net::error_code file_body (std::string path)
+        [[nodiscard]] b_net::error_code file_body(std::string path)
         {
             std::filesystem::path p(path);
 

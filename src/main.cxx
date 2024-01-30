@@ -77,12 +77,15 @@ int main(int argc, char** argv) {
             std::stringstream ss;
             std::error_code ec;
             ss << "This is test binary response!\n";
-            for (auto& elem : req.queries()) {
+            for (const auto& elem : req.queries()) {
                 if (elem.query() != req.queries().back().query()) {
                     ss << elem.query() << ": " << elem.value() << '\n';
                     continue;
                 }
                 ss << elem.query() << ": " << elem.value();
+            }
+            for (const auto& elem : req.cookies()) {
+                ss << elem.name() << ": " << elem.value() << '\n';
             }
             res.body(ss.str().c_str(), ss.str().length(), BINARY);
         }

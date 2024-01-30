@@ -7,6 +7,8 @@ namespace b_net {
         CANT_OPEN_FILE
     };
 
+    // Custom error code class to write status of some operations 
+    // Without throwing an exception
     class error_code {
     protected:
         status m_status = status::OK;

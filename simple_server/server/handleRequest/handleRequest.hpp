@@ -43,29 +43,44 @@ namespace HandleRequest {
             return res;
         };
 
-        std::cout << req.body() << std::endl;
-        std::cout << req.base() << std::endl;
-
         // Handle incoming request
         for (auto& elem : routes) {
             using namespace b_net;
 
+            // Check target - is it valid or not
             if (!elem.isValid(req.target()))
                 return bad_request("Bad request. Illegal request-target");
 
+            // Check request target and skip current loop
+            // If there is no such route target
             if (!elem.isTarget(req.target()))
                 continue;
 
+            // Check request method
             if (!elem.methodAllowed(req.method()))
                 return bad_request("Bad request. Method not allowed");
 
+            // Declare variables here to prevent copying of them
+            std::list<ParsedQuery> queries;
+            std::list<ParsedCookie> cookies;
+            std::string cookies_str;
+
             // Construct custom b_net request class for the handler
             b_net::Request req_(
+                // Request target
                 req.target(),
-                utility_::parseQueries(req.target()),
+                // Parse and pass list of queries
+                utility_::parseQueries(req.target(), queries),
+                // Parse and pass list of cookies
+                utility_::parse_cookies(
+                    utility_::get_cookie_field(req.base(), cookies_str),
+                    cookies
+                ),
+                // Convert beast method to b_net method
                 utility_::convertMethod(req.method())
             );
 
+            // Check query parameters
             if(!elem.queriesExist(req_.queries()))
                 return bad_request("Bad request. Not allowed query parameter(s)");
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "../request/request.hpp"
+#include "../response/response.hpp"
 
 namespace b_net {
     class Query {

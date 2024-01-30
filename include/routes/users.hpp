@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "../../simple_server/net_handler.hpp"
+#include "../dependencies.hpp"
 
 void getUsers(
     b_net::Request& req,
