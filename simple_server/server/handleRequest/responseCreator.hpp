@@ -7,53 +7,28 @@ http::message_generator createResponse(
     bool keep_alive
 )
 {
-    struct utility_class : public b_net::Response {
+    using namespace b_net;
+
+    struct utility_class : public Response {
         // Parent class constructor
-        utility_class(b_net::Response& response_class)
+        utility_class(Response& response_class)
             : Response(response_class) { }
         // Getters for handler
-        b_net::BodyType getType() { return m_type; }
+        // Get pointer to body
         [[nodiscard]] unsigned char* getBody() { return m_body; }
         // Body length
         [[nodiscard]] size_t getSize() { return m_size; }
         // List of fields to set
-        [[nodiscard]] std::list<b_net::Field>& getSetFields()
-        {
-            return m_setFields;
-        }
+        [[nodiscard]]
+            std::list<Field>& set_fields() { return m_set_fields; }
         // List of field to insert
-        [[nodiscard]] std::list<b_net::Field>& getInsertFields()
-        {
-            return m_insertFields;
-        }
+        [[nodiscard]]
+            std::list<Field>& insert_fields() { return m_ins_fields; }
     };
     utility_class res_(r);
 
-    // Response type - text
-    if (res_.getSize() && res_.getType() == b_net::BodyType::TEXT)
-    {
-        http::response<http::string_body> res{http::status::ok, version};
-        res.set(http::field::server, "Rest API by bergemon");
-        res.set(http::field::content_type, "text/plain");
-        res.keep_alive(keep_alive);
-        res.body() = reinterpret_cast<char*>(res_.getBody());
-        res.content_length(res_.getSize());
-        // Loop for all fields that we must set into http header
-        for (const auto& elem : res_.getSetFields())
-        {
-            res.set(elem.getName(), elem.getValue());
-        }
-        // Loop for all fields that we must insert into http header
-        for (const auto& elem : res_.getInsertFields())
-        {
-            res.insert(elem.getName(), elem.getValue());
-        }
-        res.prepare_payload();
-        return res;
-    }
-
-    // Response type - binary
-    if (res_.getSize() && res_.getType() == b_net::BodyType::BINARY)
+    // Forming boost beast response class
+    if (res_.getSize() > 0)
     {
         http::response<http::buffer_body> res{http::status::ok, version};
         res.set(http::field::server, "Rest API by bergemon");
@@ -63,14 +38,14 @@ http::message_generator createResponse(
         res.keep_alive(keep_alive);
         res.content_length(res_.getSize());
         // Loop for all fields that we must set into http header
-        for (const auto& elem : res_.getSetFields())
+        for (const auto& elem : res_.set_fields())
         {
-            res.set(elem.getName(), elem.getValue());
+            res.set(elem.name(), elem.value());
         }
         // Loop for all fields that we must insert into http header
-        for (const auto& elem : res_.getInsertFields())
+        for (const auto& elem : res_.insert_fields())
         {
-            res.insert(elem.getName(), elem.getValue());
+            res.insert(elem.name(), elem.value());
         }
         return res;
     }
@@ -78,17 +53,16 @@ http::message_generator createResponse(
     // If response body is empty
     http::response<http::empty_body> res{http::status::ok, version};
     res.set(http::field::server, "Rest API by bergemon");
-    res.set(http::field::content_type, "text/plain");
     res.keep_alive(keep_alive);
     // Loop for all fields that we must set into http header
-    for (const auto& elem : res_.getSetFields())
+    for (const auto& elem : res_.set_fields())
     {
-        res.set(elem.getName(), elem.getValue());
+        res.set(elem.name(), elem.value());
     }
     // Loop for all fields that we must insert into http header
-    for (const auto& elem : res_.getInsertFields())
+    for (const auto& elem : res_.insert_fields())
     {
-        res.insert(elem.getName(), elem.getValue());
+        res.insert(elem.name(), elem.value());
     }
     res.prepare_payload();
     return res;

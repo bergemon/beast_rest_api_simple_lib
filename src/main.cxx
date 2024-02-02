@@ -8,26 +8,16 @@
 #define _DEBUG
 
 int main(int argc, char** argv) {
+#ifdef _WIN32
+    setlocale(LC_ALL, "Rus");
+#endif
 
     std::cout << "Pet REST API by bergemon ver. "
         << APP_VERSION_MAJOR << '.' << APP_VERSION_MINOR << '\n'
         << "WebSocket listener will run on the passed port plus five."
         << std::endl;
 
-    // Check command line arguments.
-    if (argc < 2 && argc != 3) {
-        std::cerr << "Usage: [AppName] <port> <threads>\n" << "Example: [AppName] 80 1\n"
-            << "Passing number of threads is not necessary.\n"
-            << "If you don't pass number of threads, there will be only one."
-            << std::endl;
-        return EXIT_FAILURE;
-    }
-    auto const port = static_cast<unsigned short>(std::atoi(argv[1]));
-    int threads = 1;
-    if (argc > 2)
-        threads = std::max<int>(1, std::atoi(argv[2]));
-
-    b_net::Server server(port, threads);
+    b_net::Server server;
 
     server.ROUTE(
         // Allowed methods<enum Method> for this route
@@ -87,7 +77,52 @@ int main(int argc, char** argv) {
             for (const auto& elem : req.cookies()) {
                 ss << elem.name() << ": " << elem.value() << '\n';
             }
-            res.body(ss.str().c_str(), ss.str().length(), BINARY);
+            res.body(ss.str().c_str(), ss.str().length(), TEXT);
+        }
+    );
+
+    server.ROUTE(
+        // Allowed methods<enum Method> for this route
+        { GET },
+        // Route target<string>
+        "/text",
+        // Route handler
+        [&](
+            b_net::Request& req,
+            b_net::Response& res
+        ) {
+            std::stringstream ss;
+            std::error_code ec;
+            ss << "This is test binary response!\n";
+            for (const auto& elem : req.queries()) {
+                if (elem.query() != req.queries().back().query()) {
+                    ss << elem.query() << ": " << elem.value() << '\n';
+                    continue;
+                }
+                ss << elem.query() << ": " << elem.value();
+            }
+            for (const auto& elem : req.cookies()) {
+                ss << elem.name() << ": " << elem.value() << '\n';
+            }
+            res.body(ss.str());
+        }
+    );
+
+    server.ROUTE(
+        // Allowed methods<enum Method> for this route
+        { GET },
+        // Route target<string>
+        "/file",
+        // Route handler
+        [&](
+            b_net::Request& req,
+            b_net::Response& res
+        ) {
+            std::ofstream file("file.png", std::ios::binary | std::ios::out);
+            if (file.is_open())
+            {
+                file.write(req.body(), req.body_size());
+            }
         }
     );
 

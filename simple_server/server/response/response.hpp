@@ -2,9 +2,6 @@
 #include "../request/request.hpp"
 
 namespace b_net {
-
-    enum BodyType { TEXT, BINARY };
-
     struct Field {
     private:
         std::string m_name;
@@ -15,18 +12,16 @@ namespace b_net {
             : m_name(name), m_value(value)
         { }
 
-        const char* getName() const { return m_name.c_str(); }
-        const char* getValue() const { return m_value.c_str(); }
+        const char* name() const { return m_name.c_str(); }
+        const char* value() const { return m_value.c_str(); }
     };
 
     class Response {
     protected:
-        BodyType m_type = BodyType::TEXT;
         unsigned char* m_body = nullptr;
         size_t m_size = 0;
-        std::list<Field> m_setFields;
-        std::list<Field> m_insertFields;
-        std::string m_contentType;
+        std::list<Field> m_set_fields;
+        std::list<Field> m_ins_fields;
 
         size_t check(const char* body = nullptr)
         {
@@ -75,40 +70,45 @@ namespace b_net {
             delete[] m_body;
             m_body = nullptr;
             m_size = 0;
-            m_setFields.clear();
-            m_insertFields.clear();
+            m_set_fields.clear();
+            m_ins_fields.clear();
 
             return *this;
         }
 
         // const char body
-        void body(const char* body)
+        void body(const char* body, BodyType type = JSON)
         {
+            using namespace utility_;
             initialize(check(body), body);
-            m_type = TEXT;
+            content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // array of chars body
-        void body(char* body)
+        void body(char* body, BodyType type = JSON)
         {
+            using namespace utility_;
             initialize(check(body), body);
-            m_type = TEXT;
+            content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // string body
-        void body(std::string body)
+        void body(std::string body, BodyType type = JSON)
         {
-            initialize(body.length() + 1, body.c_str());
-            m_type = TEXT;
+            using namespace utility_;
+            initialize(body.length(), body.c_str());
+            content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // For binary body. You need to point number of body octets.
         void body(char* body, size_t size, BodyType type = BINARY)
         {
+            using namespace utility_;
             initialize(size, body);
-            m_type = type;
+            content_type(mime_type(bodyType_to_mimeType(type)));
         }
         void body(const char* body, size_t size, BodyType type = BINARY)
         {
+            using namespace utility_;
             initialize(size, body);
-            m_type = type;
+            content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // file body, write a path to the file
         [[nodiscard]] b_net::error_code file_body(std::string path)
@@ -121,7 +121,7 @@ namespace b_net {
                     (b_net::status::FILE_NOT_FOUND, "File not found");
             }
 
-            std::ifstream file(p.c_str());
+            std::ifstream file(p.c_str(), std::ios::binary);
             unsigned char* data_ptr = nullptr;
             size_t file_size = 0;
 
@@ -141,30 +141,26 @@ namespace b_net {
             }
 
             initialize(file_size, data_ptr);
-            m_type = BINARY;
             content_type(utility_::mime_type(path));
 
             return b_net::error_code
                 (b_net::status::OK, "Body was filled with the file octets");
         }
 
+        // Set http header fields
         void set(std::string name, std::string value)
         {
-            m_setFields.push_back(Field(name, value));
+            m_set_fields.push_back(Field(name, value));
         }
         void insert(std::string name, std::string value)
         {
-            m_insertFields.push_back(Field(name, value));
+            m_ins_fields.push_back(Field(name, value));
         }
 
         // Set content type for binary file
-        void content_type(const char* text)
-        {
-            m_setFields.push_back(Field("Content-Type", text));
-        }
         void content_type(std::string text)
         {
-            m_setFields.push_back(Field("Content-Type", text));
+            m_set_fields.push_back(Field("Content-Type", text));
         }
 
         friend class utility_class;

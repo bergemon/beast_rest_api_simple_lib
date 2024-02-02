@@ -43,6 +43,10 @@ namespace HandleRequest {
             b_net::Request req_(
                 // Request target
                 req.target(),
+                // Request body
+                req.body(),
+                // Request body size
+                req.body().size(),
                 // Parse and pass list of queries
                 utility_::parseQueries(req.target(), queries),
                 // Parse and pass list of cookies

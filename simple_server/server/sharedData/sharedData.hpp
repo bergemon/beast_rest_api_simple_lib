@@ -30,6 +30,14 @@ namespace b_net {
 
     // Custom methods
     enum Method { ALL, HEAD, GET, POST, PUT, DELETE_, PATCH };
+
+    // Response body type
+    enum BodyType {
+        TEXT, JSON, JPEG, PNG, BMP, GIF, ZIP, RAR,
+        HTML, CSS, JS, TIFF, WEBP, FLV, AVI, MP4,
+        ICO, XML, WOFF, WOFF2, SVG, SEVEN_ZIP, MP3,
+        MPEG, BINARY
+    };
     
     // Class container for parsed queries
     class ParsedQuery {

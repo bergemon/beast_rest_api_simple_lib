@@ -32,6 +32,13 @@ namespace utility_ {
         {
             return "image/svg+xml";
         }
+        if (iequals(ext, ".avi")) { return "video/x-msvideo"; }
+        if (iequals(ext, ".mp3")) { return "audio/mpeg"; }
+        if (iequals(ext, ".mp4")) { return "video/mp4"; }
+        if (iequals(ext, ".mpeg")) { return "video/mpeg"; }
+        if (iequals(ext, ".7z")) { return "application/x-7z-compressed"; }
+        if (iequals(ext, ".rar")) { return "application/x-rar-compressed"; }
+        if (iequals(ext, ".zip")) { return "application/x-zip-compressed"; }
         if (iequals(ext, ".css")) { return "text/css"; }
         if (iequals(ext, ".txt")) { return "text/plain"; }
         if (iequals(ext, ".js")) { return "application/javascript"; }
@@ -47,6 +54,44 @@ namespace utility_ {
         if (iequals(ext, ".woff")) { return "font/woff"; }
         if (iequals(ext, ".woff2")) { return "text/woff2"; }
 
-        return "application/text";
+        return "application/octet-stream";
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // This function is coverting b_net::BodyType to string mime_type
+    //////////////////////////////////////////////////////////////////////
+    inline std::string bodyType_to_mimeType(b_net::BodyType type) {
+        using namespace b_net;
+
+        switch(type)
+        {
+            case TEXT: return {".txt"};
+            case JSON: return {".json"};
+            case JPEG: return {".jpeg"};
+            case PNG: return {".png"};
+            case BMP: return {".bmp"};
+            case GIF: return {".gif"};
+            case ZIP: return {".zip"};
+            case RAR: return {".rar"};
+            case HTML: return {".html"};
+            case CSS: return {".css"};
+            case JS: return {".js"};
+            case TIFF: return {".tiff"};
+            case WEBP: return {".webp"};
+            case FLV: return {".flv"};
+            case AVI: return {".avi"};
+            case MP4: return {".mp4"};
+            case ICO: return {".ico"};
+            case XML: return {".xml"};
+            case WOFF: return {".woff"};
+            case WOFF2: return {".woff2"};
+            case SVG: return {".svg"};
+            case SEVEN_ZIP: return {".7z"};
+            case MP3: return {".mp3"};
+            case MPEG: return {".mpeg"};
+            case BINARY: return {""};
+            default: return {""};
+        }
+        return {""};
     }
 }

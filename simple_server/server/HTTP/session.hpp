@@ -6,13 +6,14 @@ namespace Session {
     class Session : public std::enable_shared_from_this<Session> {
         beast::tcp_stream m_stream;
         beast::flat_buffer m_buffer;
-        http::request<http::string_body> m_request;
+        http::request_parser<http::dynamic_body> m_parser;
         std::vector<b_net::Route>& m_routes;
         b_net::Response m_custom_response;
 
     public:
         Session(tcp::socket&& socket, std::vector<b_net::Route>& routes)
-            : m_stream(std::move(socket)), m_routes(routes) { }
+            : m_stream(std::move(socket)), m_routes(routes)
+        { }
 
         ~Session() { m_custom_response.clear(); }
 
@@ -24,10 +25,11 @@ namespace Session {
 
         void do_read()
         {
-            m_request = {};
             m_stream.expires_after(std::chrono::seconds(30));
 
-            http::async_read(m_stream, m_buffer, m_request,
+            m_parser.body_limit((std::numeric_limits<std::uint64_t>::max)());
+            
+            http::async_read(m_stream, m_buffer, m_parser,
                 beast::bind_front_handler(&Session::on_read, shared_from_this()));
         }
 
@@ -41,10 +43,11 @@ namespace Session {
             if (ec)
                 return utility_::fail(ec, "read");
 
+            http::request<http::dynamic_body> request = m_parser.get();
             send_response(
                 HandleRequest::handle_request(
                     m_custom_response,
-                    std::move(m_request),
+                    std::move(request),
                     m_routes
                 )
             );
