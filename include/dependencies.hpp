@@ -10,6 +10,7 @@
 #include <iostream>
 #include <memory>
 #include <string>
+#include <cassert>
 #include <thread>
 #include <vector>
 #include <chrono>

@@ -18,7 +18,8 @@ namespace HandleRequest {
                 return b_net_errs::bad_request(
                     "Bad request. Illegal request-target",
                     req.version(),
-                    req.keep_alive()
+                    req.keep_alive(),
+                    req.method()
                 );
 
             // Check request target and skip current loop
@@ -31,7 +32,8 @@ namespace HandleRequest {
                 return b_net_errs::bad_request(
                     "Bad request. Method not allowed",
                     req.version(),
-                    req.keep_alive()
+                    req.keep_alive(),
+                    req.method()
                 );
 
             // Declare variables here to prevent copying of them
@@ -55,7 +57,9 @@ namespace HandleRequest {
                     cookies
                 ),
                 // Convert beast method to b_net method
-                utility_::convertMethod(req.method())
+                utility_::convertMethod(req.method()),
+                // Parse type of incoming file - how to decode octets
+                utility_::mimeType_to_bodyType(utility_::parse_bodyType(req.base()))
             );
 
             // Check query parameters
@@ -63,15 +67,22 @@ namespace HandleRequest {
                 return b_net_errs::bad_request(
                     "Bad request. Not allowed query parameter(s)",
                     req.version(),
-                    req.keep_alive()
+                    req.keep_alive(),
+                    req.method()
                 );
 
             // Invoke route handler and get custom b_net response class
             elem.handler()(req_, res.clear());
 
-            return createResponse(res, req.version(), req.keep_alive());
+            return createResponse(res, req.version(), req.keep_alive(), req.method());
         }
 
-        return b_net_errs::not_found(req.target(), req.version(), req.keep_alive());
+        // If we not found request target aka route
+        return b_net_errs::not_found(
+            req.target(),
+            req.version(),
+            req.keep_alive(),
+            req.method()
+        );
     }
 }

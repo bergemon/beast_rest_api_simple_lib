@@ -19,8 +19,8 @@ namespace b_net {
     };
 
     class Route {
-        const bool m_all_methods;
         const std::vector<Method> m_methods;
+        const bool m_all_methods;
         const std::string m_target;
         const std::vector<Query> m_queries;
         const std::function<void(Request&, Response&)> m_handler;
@@ -39,7 +39,8 @@ namespace b_net {
 
         bool hasAllMethod()
         {
-            for (const auto& elem : m_methods) {
+            for (const auto& elem : m_methods)
+            {
                 if(elem == Method::ALL) { return true; }
             }
             return false;

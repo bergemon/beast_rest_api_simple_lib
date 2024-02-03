@@ -3,8 +3,9 @@
 
 http::message_generator createResponse(
     b_net::Response& r,
-    uint32_t version,
-    bool keep_alive
+    const uint32_t version,
+    const bool keep_alive,
+    const http::verb method
 )
 {
     using namespace b_net;
@@ -28,7 +29,7 @@ http::message_generator createResponse(
     utility_class res_(r);
 
     // Forming boost beast response class
-    if (res_.getSize() > 0)
+    if (res_.getSize() > 0 && method != http::verb::head)
     {
         http::response<http::buffer_body> res{http::status::ok, version};
         res.set(http::field::server, "Rest API by bergemon");
@@ -50,7 +51,7 @@ http::message_generator createResponse(
         return res;
     }
 
-    // If response body is empty
+    // If response body is empty or request method was head
     http::response<http::empty_body> res{http::status::ok, version};
     res.set(http::field::server, "Rest API by bergemon");
     res.keep_alive(keep_alive);
@@ -65,5 +66,6 @@ http::message_generator createResponse(
         res.insert(elem.name(), elem.value());
     }
     res.prepare_payload();
+    res.content_length(res_.getSize());
     return res;
 }

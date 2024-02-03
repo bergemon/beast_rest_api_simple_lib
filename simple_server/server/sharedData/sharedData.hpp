@@ -10,9 +10,12 @@
 #include <string>
 #include <cstdint>
 #include <vector>
+#include <array>
+#include <cassert>
 #include <list>
 #include <filesystem>
 #include <fstream>
+#include <optional>
 #include <boost/asio.hpp>
 #include <boost/beast.hpp>
 
@@ -34,9 +37,9 @@ namespace b_net {
     // Response body type
     enum BodyType {
         TEXT, JSON, JPEG, PNG, BMP, GIF, ZIP, RAR,
-        HTML, CSS, JS, TIFF, WEBP, FLV, AVI, MP4,
-        ICO, XML, WOFF, WOFF2, SVG, SEVEN_ZIP, MP3,
-        MPEG, BINARY
+        HTML, CSS, JS, TIFF, WEBP, AVI, MP4, ICO,
+        XML, WOFF, WOFF2, SVG, SEVEN_ZIP, MP3, MPEG,
+        BINARY
     };
     
     // Class container for parsed queries
@@ -65,6 +68,32 @@ namespace b_net {
         std::string value() const { return m_value; }
     };
 }
+
+// Body type
+using b_net::BodyType::TEXT;
+using b_net::BodyType::JSON;
+using b_net::BodyType::JPEG;
+using b_net::BodyType::PNG;
+using b_net::BodyType::BMP;
+using b_net::BodyType::GIF;
+using b_net::BodyType::ZIP;
+using b_net::BodyType::RAR;
+using b_net::BodyType::HTML;
+using b_net::BodyType::CSS;
+using b_net::BodyType::JS;
+using b_net::BodyType::TIFF;
+using b_net::BodyType::WEBP;
+using b_net::BodyType::AVI;
+using b_net::BodyType::MP4;
+using b_net::BodyType::ICO;
+using b_net::BodyType::XML;
+using b_net::BodyType::WOFF;
+using b_net::BodyType::WOFF2;
+using b_net::BodyType::SVG;
+using b_net::BodyType::SEVEN_ZIP;
+using b_net::BodyType::MP3;
+using b_net::BodyType::MPEG;
+using b_net::BodyType::BINARY;
 
 // Type of query
 using b_net::Type::BOOL_;

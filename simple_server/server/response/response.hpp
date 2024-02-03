@@ -29,7 +29,7 @@ namespace b_net {
             if (body == nullptr) return counter;
 
             while(body[counter] != '\0') { ++counter; }
-            return ++counter;
+            return counter;
         }
         size_t check(char* body = nullptr)
         {
@@ -37,7 +37,7 @@ namespace b_net {
             if (body == nullptr) return counter;
 
             while(body[counter] != '\0') { ++counter; }
-            return ++counter;
+            return counter;
         }
 
         void initialize(size_t size, const char* body)
@@ -76,34 +76,35 @@ namespace b_net {
             return *this;
         }
 
-        // const char body
+        // Const char response body
         void body(const char* body, BodyType type = JSON)
         {
             using namespace utility_;
             initialize(check(body), body);
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
-        // array of chars body
+        // Array of chars response body
         void body(char* body, BodyType type = JSON)
         {
             using namespace utility_;
             initialize(check(body), body);
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
-        // string body
+        // String response body
         void body(std::string body, BodyType type = JSON)
         {
             using namespace utility_;
             initialize(body.length(), body.c_str());
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
-        // For binary body. You need to point number of body octets.
+        // Binary body. You need to point number of body octets.
         void body(char* body, size_t size, BodyType type = BINARY)
         {
             using namespace utility_;
             initialize(size, body);
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
+        // Binary body. You need to point number of body octets.
         void body(const char* body, size_t size, BodyType type = BINARY)
         {
             using namespace utility_;
@@ -166,6 +167,3 @@ namespace b_net {
         friend class utility_class;
     };
 }
-
-using b_net::BodyType::BINARY;
-using b_net::BodyType::TEXT;

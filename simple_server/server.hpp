@@ -93,19 +93,23 @@ namespace b_net {
         }
 
         // Put new route to handle by the server
-        void ROUTE (std::vector<Method> methods, std::string target, std::vector<Query> queries,
-            std::function<void(Request&, Response&)> handler)
+        void ROUTE (const std::vector<Method> methods,
+            const std::string target,
+            const std::vector<Query> queries,
+            const std::function<void(Request&, Response&)> handler)
         {
             m_routes.push_back(Route{ methods, target, queries, handler });
         }
 
         // Put new route to handle by the server
-        void ROUTE (std::vector<Method> methods, std::string target,
-            std::function<void(Request&, Response&)> handler)
+        void ROUTE (const std::vector<Method> methods,
+            const std::string target,
+            const std::function<void(Request&, Response&)> handler)
         {
             m_routes.push_back(Route{ methods, target, {}, handler });
         }
 
+        // Run the server, start to listen incoming messages on the setted port
         void run()
         {
             // Start to listen incoming connections

@@ -45,7 +45,6 @@ namespace utility_ {
         if (iequals(ext, ".json")) { return "application/json"; }
         if (iequals(ext, ".xml")) { return "application/xml"; }
         if (iequals(ext, ".swf")) { return "application/x-shockwave-flash"; }
-        if (iequals(ext, ".flv")) { return "video/x-flv"; }
         if (iequals(ext, ".png")) { return "image/png"; }
         if (iequals(ext, ".gif")) { return "image/gif"; }
         if (iequals(ext, ".bmp")) { return "image/bmp"; }
@@ -78,7 +77,6 @@ namespace utility_ {
             case JS: return {".js"};
             case TIFF: return {".tiff"};
             case WEBP: return {".webp"};
-            case FLV: return {".flv"};
             case AVI: return {".avi"};
             case MP4: return {".mp4"};
             case ICO: return {".ico"};
@@ -93,5 +91,18 @@ namespace utility_ {
             default: return {""};
         }
         return {""};
+    }
+
+    // Get copy of inputed string but with all characters in lower case
+    // You can not put string with length more that 500 characters
+    inline std::string string_to_lower(std::string& str)
+    {
+        assert(str.length() <= 500);
+
+        std::string temp_str;
+        for (auto& elem : str)
+            temp_str.push_back(std::tolower(elem));
+
+        return temp_str;
     }
 }

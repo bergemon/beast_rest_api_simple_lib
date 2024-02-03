@@ -48,20 +48,13 @@ namespace utility_ {
 
         switch(method)
         {
-            case http::verb::head:
-                return Method::HEAD;
-            case http::verb::get:
-                return Method::GET;
-            case http::verb::post:
-                return Method::POST;
-            case http::verb::put:
-                return Method::PUT;
-            case http::verb::delete_:
-                return Method::DELETE_;
-            case http::verb::patch:
-                return Method::PATCH;
-            default:
-                return Method::HEAD;
+            case http::verb::head: return Method::HEAD;
+            case http::verb::get: return Method::GET;
+            case http::verb::post: return Method::POST;
+            case http::verb::put: return Method::PUT;
+            case http::verb::delete_: return Method::DELETE_;
+            case http::verb::patch: return Method::PATCH;
+            default: return Method::HEAD;
         }
     }
 
@@ -75,7 +68,8 @@ namespace utility_ {
     {
         for (const auto& elem : header)
         {
-            if (elem.name_string() == "Cookie")
+            std::string field = elem.name_string();
+            if (string_to_lower(field) == "cookie")
                 str = elem.value();
         }
         return str;
@@ -104,5 +98,53 @@ namespace utility_ {
             cookies.substr(cookies.find("=") + 1)
         });
         return l;
+    }
+    //////////////////////////////////////////////////////////////////////
+    // Mime type to b_net BodyType
+    //////////////////////////////////////////////////////////////////////
+    b_net::BodyType mimeType_to_bodyType(std::string mime_type)
+    {
+        using namespace b_net;
+
+        if(mime_type == "text/plain") return TEXT;
+        if(mime_type == "application/json") return JSON;
+        if(mime_type == "image/jpeg") return JPEG;
+        if(mime_type == "image/png") return PNG;
+        if(mime_type == "image/bmp") return BMP;
+        if(mime_type == "image/gif") return GIF;
+        if(mime_type == "application/zip") return ZIP;
+        if(mime_type == "application/vnd.rar") return RAR;
+        if(mime_type == "text/html") return HTML;
+        if(mime_type == "text/css") return CSS;
+        if(mime_type == "text/javascript") return JS;
+        if(mime_type == "image/tiff") return TIFF;
+        if(mime_type == "image/webp") return WEBP;
+        if(mime_type == "video/x-msvideo") return AVI;
+        if(mime_type == "video/mp4") return MP4;
+        if(mime_type == "image/vnd.microsoft.icon") return ICO;
+        if(mime_type == "application/xml") return XML;
+        if(mime_type == "font/woff") return WOFF;
+        if(mime_type == "font/woff2") return WOFF2;
+        if(mime_type == "image/svg+xml") return SVG;
+        if(mime_type == "application/x-7z-compressed") return SEVEN_ZIP;
+        if(mime_type == "audio/mpeg") return MP3;
+        if(mime_type == "video/mpeg") return MPEG;
+
+        return BINARY;
+    }
+    //////////////////////////////////////////////////////////////////////
+    // Parse http request header fields to get body type
+    //////////////////////////////////////////////////////////////////////
+    template<bool isRequest, class Fields>
+    std::string parse_bodyType(http::header<isRequest, Fields>& header)
+    {
+        std::string content_type;
+        for (const auto& elem : header)
+        {
+            std::string field = elem.name_string();
+            if (string_to_lower(field) == "content-type")
+                content_type = elem.value();
+        }
+        return content_type;
     }
 }

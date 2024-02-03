@@ -8,7 +8,8 @@ namespace b_net {
         size_t m_body_size;
         std::list<ParsedQuery>& m_queries;
         std::list<ParsedCookie>& m_cookies;
-        b_net::Method m_method;
+        Method m_method;
+        BodyType m_type;
 
     public:
         Request(
@@ -17,11 +18,12 @@ namespace b_net {
             size_t size,
             std::list<ParsedQuery>& queries,
             std::list<ParsedCookie>& cookies,
-            b_net::Method method
+            Method method,
+            BodyType type
         )
             : m_target(target), m_queries(queries),
             m_method(method), m_cookies(cookies),
-            m_body_size(size)
+            m_body_size(size), m_type(type)
         {
             m_body = new char[m_body_size];
             for (const auto& elem : buffer.data())
@@ -39,6 +41,13 @@ namespace b_net {
         size_t body_size() const { return m_body_size; }
         const std::list<ParsedQuery>& queries() const { return m_queries; }
         const std::list<ParsedCookie>& cookies() const { return m_cookies; }
-        b_net::Method method() const { return m_method; }
+        Method method() const { return m_method; }
+        BodyType type() const { return m_type; }
+
+        // Get mime type aka file extension
+        const std::string mime_type()
+        {
+            return utility_::bodyType_to_mimeType(m_type);
+        }
     };
 }

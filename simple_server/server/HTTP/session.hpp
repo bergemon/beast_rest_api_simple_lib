@@ -6,7 +6,7 @@ namespace Session {
     class Session : public std::enable_shared_from_this<Session> {
         beast::tcp_stream m_stream;
         beast::flat_buffer m_buffer;
-        http::request_parser<http::dynamic_body> m_parser;
+        std::optional<http::request_parser<http::dynamic_body>> m_parser;
         std::vector<b_net::Route>& m_routes;
         b_net::Response m_custom_response;
 
@@ -27,9 +27,10 @@ namespace Session {
         {
             m_stream.expires_after(std::chrono::seconds(30));
 
-            m_parser.body_limit((std::numeric_limits<std::uint64_t>::max)());
+            m_parser.emplace();
+            m_parser->body_limit((std::numeric_limits<std::uint64_t>::max)());
             
-            http::async_read(m_stream, m_buffer, m_parser,
+            http::async_read(m_stream, m_buffer, *m_parser,
                 beast::bind_front_handler(&Session::on_read, shared_from_this()));
         }
 
@@ -43,11 +44,10 @@ namespace Session {
             if (ec)
                 return utility_::fail(ec, "read");
 
-            http::request<http::dynamic_body> request = m_parser.get();
             send_response(
                 HandleRequest::handle_request(
                     m_custom_response,
-                    std::move(request),
+                    std::move(m_parser->get()),
                     m_routes
                 )
             );

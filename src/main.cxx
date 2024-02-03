@@ -1,11 +1,8 @@
 ﻿#include "../include/dependencies.hpp"
-#include "../simple_server/server.hpp"
 #include "include/variables.hpp"
 
 // routes
 #include "../include/routes.hpp"
-
-#define _DEBUG
 
 int main(int argc, char** argv) {
 #ifdef _WIN32
@@ -16,8 +13,6 @@ int main(int argc, char** argv) {
         << APP_VERSION_MAJOR << '.' << APP_VERSION_MINOR << '\n'
         << "WebSocket listener will run on the passed port plus five."
         << std::endl;
-
-    b_net::Server server;
 
     server.ROUTE(
         // Allowed methods<enum Method> for this route
@@ -67,6 +62,7 @@ int main(int argc, char** argv) {
             std::stringstream ss;
             std::error_code ec;
             ss << "This is test binary response!\n";
+            ss << "Cookies: \n";
             for (const auto& elem : req.queries()) {
                 if (elem.query() != req.queries().back().query()) {
                     ss << elem.query() << ": " << elem.value() << '\n';
@@ -85,44 +81,21 @@ int main(int argc, char** argv) {
         // Allowed methods<enum Method> for this route
         { GET },
         // Route target<string>
-        "/text",
-        // Route handler
-        [&](
-            b_net::Request& req,
-            b_net::Response& res
-        ) {
-            std::stringstream ss;
-            std::error_code ec;
-            ss << "This is test binary response!\n";
-            for (const auto& elem : req.queries()) {
-                if (elem.query() != req.queries().back().query()) {
-                    ss << elem.query() << ": " << elem.value() << '\n';
-                    continue;
-                }
-                ss << elem.query() << ": " << elem.value();
-            }
-            for (const auto& elem : req.cookies()) {
-                ss << elem.name() << ": " << elem.value() << '\n';
-            }
-            res.body(ss.str());
-        }
-    );
-
-    server.ROUTE(
-        // Allowed methods<enum Method> for this route
-        { GET },
-        // Route target<string>
         "/file",
         // Route handler
         [&](
             b_net::Request& req,
             b_net::Response& res
         ) {
-            std::ofstream file("file.png", std::ios::binary | std::ios::out);
+            std::string file_name = "file";
+            file_name += req.mime_type();
+            std::ofstream file(file_name, std::ios::binary | std::ios::out);
             if (file.is_open())
             {
                 file.write(req.body(), req.body_size());
             }
+
+            res.body("{\"status\": \"ok\"}", JSON);
         }
     );
 
