@@ -7,10 +7,10 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     std::list<ParsedQuery>&
         parseQueries
-        (const std::string target, std::list<ParsedQuery>& l)
+        (const std::string target, std::list<ParsedQuery>& list)
     {
         // If there is no query parameters
-        if(target.find("?") == std::string::npos) { l.clear(); return l; }
+        if(target.find("?") == std::string::npos) { list.clear(); return list; }
 
         // String with query parameters to parse
         std::string q_str{
@@ -22,7 +22,7 @@ namespace utility_ {
 
         while(q_str.find("&") != std::string::npos) 
         {
-            l.push_back({
+            list.push_back({
                 q_str.substr(0, q_str.find("=")),
                 q_str.substr(q_str.find("=") + 1, q_str.find("&") - (q_str.find("=") + 1))
             });
@@ -30,13 +30,13 @@ namespace utility_ {
                 q_str.substr(q_str.find("&") + 1, q_str.length() - (q_str.find("&") + 1));
 
             if (q_str.find("&") == std::string::npos) {
-                l.push_back({
+                list.push_back({
                     q_str.substr(0, q_str.find("=")),
                     q_str.substr(q_str.find("=") + 1, q_str.length() - (q_str.find("=") + 1))
                 });
             }
         }
-        return l;
+        return list;
     }
 
     //////////////////////////////////////////////////////////////////////
