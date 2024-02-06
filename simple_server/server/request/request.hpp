@@ -2,7 +2,7 @@
 #include "../sharedData/sharedFunctions.hpp"
 
 namespace b_net {
-    class Request {
+    class Request final {
         std::string m_target;
         char* m_body = nullptr;
         size_t m_body_size;

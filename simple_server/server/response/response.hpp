@@ -2,7 +2,7 @@
 #include "../request/request.hpp"
 
 namespace b_net {
-    struct Field {
+    struct Field final {
     private:
         std::string m_name;
         std::string m_value;
@@ -16,12 +16,28 @@ namespace b_net {
         const char* value() const { return m_value.c_str(); }
     };
 
-    class Response {
+    class Response final {
     protected:
         unsigned char* m_body = nullptr;
         size_t m_size = 0;
         std::list<Field> m_set_fields;
         std::list<Field> m_ins_fields;
+        
+        ////////////////////////////////////////////
+        // Getters and friendly funtion for them //
+        ///////////////////////////////////////////
+        // Get pointer to body
+        [[nodiscard]] unsigned char* get_body() { return m_body; }
+        // Body length
+        [[nodiscard]] size_t get_size() { return m_size; }
+        // List of fields to set
+        [[nodiscard]]
+            std::list<Field>& set_fields() { return m_set_fields; }
+        // List of field to insert
+        [[nodiscard]]
+            std::list<Field>& insert_fields() { return m_ins_fields; }
+        // Boost Beast response creator friendly function
+        friend http::message_generator createResponse(Response&, const uint32_t, const bool, const http::verb);
 
         size_t check(const char* body = nullptr)
         {
@@ -163,7 +179,5 @@ namespace b_net {
         {
             m_set_fields.push_back(Field("Content-Type", text));
         }
-
-        friend class utility_class;
     };
 }

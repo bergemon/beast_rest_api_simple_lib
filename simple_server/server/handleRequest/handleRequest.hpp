@@ -74,7 +74,7 @@ namespace HandleRequest {
             // Invoke route handler and get custom b_net response class
             elem.handler()(req_, res.clear());
 
-            return createResponse(res, req.version(), req.keep_alive(), req.method());
+            return b_net::createResponse(res, req.version(), req.keep_alive(), req.method());
         }
 
         // If we not found request target aka route

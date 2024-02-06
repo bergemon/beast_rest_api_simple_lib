@@ -43,7 +43,7 @@ namespace b_net {
     };
     
     // Class container for parsed queries
-    class ParsedQuery {
+    class ParsedQuery final {
         const std::string m_query;
         const std::string m_value;
         
@@ -56,7 +56,7 @@ namespace b_net {
     };
 
     // Class container for parsed cookies
-    class ParsedCookie {
+    class ParsedCookie final {
         const std::string m_name;
         const std::string m_value;
 
