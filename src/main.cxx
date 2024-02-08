@@ -64,11 +64,11 @@ int main(int argc, char** argv) {
             ss << "This is test binary response!\n";
             ss << "Cookies: \n";
             for (const auto& elem : req.queries()) {
-                if (elem.query() != req.queries().back().query()) {
-                    ss << elem.query() << ": " << elem.value() << '\n';
+                if (elem.name() != req.queries().back().name()) {
+                    ss << elem.name() << ": " << elem.value() << '\n';
                     continue;
                 }
-                ss << elem.query() << ": " << elem.value();
+                ss << elem.name() << ": " << elem.value();
             }
             for (const auto& elem : req.cookies()) {
                 ss << elem.name() << ": " << elem.value() << '\n';

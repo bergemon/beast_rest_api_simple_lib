@@ -74,7 +74,7 @@ namespace b_net {
             return false;
         }
 
-        bool queriesExist (const std::list<ParsedQuery> parsed_queries)
+        bool queriesExist (const std::list<ParsedField> parsed_queries)
         {
             bool found = false;
 
@@ -88,7 +88,7 @@ namespace b_net {
 
                 for (const auto& parsed_query : parsed_queries)
                 {
-                    if (parsed_query.query() == query.getQuery())
+                    if (parsed_query.name() == query.getQuery())
                     {
                         queryExist = true;
                         break;
@@ -106,7 +106,7 @@ namespace b_net {
 
                 for (const auto& query : m_queries)
                 {
-                    if (query.getQuery() == parsed_query.query())
+                    if (query.getQuery() == parsed_query.name())
                     {
                         queryExist = true;
                         break;

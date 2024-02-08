@@ -1,5 +1,5 @@
 #pragma once
-#include "sharedData.hpp"
+#include "using_declarations.hpp"
 
 namespace utility_ {
     //////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ namespace utility_ {
 
     // Get copy of inputed string but with all characters in lower case
     // You can not put string with length more that 500 characters
-    inline std::string string_to_lower(std::string& str)
+    inline std::string string_to_lower(std::string str)
     {
         assert(str.length() <= 500);
 

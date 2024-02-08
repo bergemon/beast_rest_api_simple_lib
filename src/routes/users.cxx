@@ -7,10 +7,10 @@ void getUsers(
 {
     int min, max;
     for (const auto& elem : req.queries()) {
-        if (elem.query() == "min") {
+        if (elem.name() == "min") {
             min = std::atoi(elem.value().c_str());
         }
-        if (elem.query() == "max") {
+        if (elem.name() == "max") {
             max = std::atoi(elem.value().c_str());
         }
     }

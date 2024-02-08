@@ -3,11 +3,27 @@
 
 namespace utility_ {
     //////////////////////////////////////////////////////////////////////
+    // Get http request header fields from Boost Beast
+    // to b_net ParsedField class
+    //////////////////////////////////////////////////////////////////////
+    template<bool isRequest, class Fields>
+    std::list<ParsedField>&
+        get_req_header_fields
+        (http::header<isRequest, Fields>& header, std::list<ParsedField>& list)
+    {
+        for (const auto& elem : header)
+        {
+            list.push_back(ParsedField(elem.name_string(), elem.value()));
+        }
+
+        return list;
+    }
+    //////////////////////////////////////////////////////////////////////
     // Parse queries and it's values from request
     //////////////////////////////////////////////////////////////////////
-    std::list<ParsedQuery>&
-        parseQueries
-        (const std::string target, std::list<ParsedQuery>& list)
+    std::list<ParsedField>&
+        parse_queries
+        (const std::string target, std::list<ParsedField>& list)
     {
         // If there is no query parameters
         if(target.find("?") == std::string::npos) { list.clear(); return list; }
@@ -42,7 +58,7 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Convert beast request method to custom b_net::Method
     //////////////////////////////////////////////////////////////////////
-    b_net::Method convertMethod(http::verb method)
+    b_net::Method convert_method(http::verb method)
     {
         using namespace b_net;
 
@@ -61,15 +77,14 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Parse cookies from the string
     //////////////////////////////////////////////////////////////////////
-    template<bool isRequest, class Fields>
-        std::string&
+    std::string
         get_cookie_field
-        (http::header<isRequest, Fields>& header, std::string& str)
+        (std::list<ParsedField>& header)
     {
+        std::string str;
         for (const auto& elem : header)
         {
-            std::string field = elem.name_string();
-            if (string_to_lower(field) == "cookie")
+            if (string_to_lower(elem.name()) == "cookie")
                 str = elem.value();
         }
         return str;
@@ -78,13 +93,18 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Parse cookies from the string
     //////////////////////////////////////////////////////////////////////
-        std::list<b_net::ParsedCookie>&
+    std::list<b_net::ParsedField>&
         parse_cookies
-        (std::string cookies, std::list<b_net::ParsedCookie>& l)
+        (
+            std::list<ParsedField>& header,
+            std::list<b_net::ParsedField>& list
+        )
     {
+        std::string cookies{ get_cookie_field(header) };
+
         while (cookies.find(";") != std::string::npos)
         {
-            l.push_back({
+            list.push_back({
                 cookies.substr(0, cookies.find("=")),
                 cookies.substr(
                     cookies.find("=") + 1,
@@ -93,11 +113,11 @@ namespace utility_ {
             });
             cookies = cookies.substr(cookies.find(";") + 2);
         }
-        l.push_back({
+        list.push_back({
             cookies.substr(0, cookies.find("=")),
             cookies.substr(cookies.find("=") + 1)
         });
-        return l;
+        return list;
     }
     //////////////////////////////////////////////////////////////////////
     // Mime type to b_net BodyType

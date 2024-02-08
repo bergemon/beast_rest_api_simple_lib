@@ -1,4 +1,5 @@
 #pragma once
+#include "lib_core_dependencies.hpp"
 
 namespace b_net {
     enum status {
