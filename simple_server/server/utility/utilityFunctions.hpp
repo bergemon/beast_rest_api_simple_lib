@@ -1,5 +1,5 @@
 #pragma once
-#include "../route/route.hpp"
+#include "../route/root_route.hpp"
 #include "request_utility_funcs.hpp"
 #include "response_utility_funcs.hpp"
 
@@ -36,5 +36,22 @@ namespace utility_ {
     void fail(beast::error_code ec, char const* what)
     {
         std::cerr << what << ": " << ec.message() << "\n";
+    }
+
+    //////////////////////////////////////////////////////////////////////
+    // Validating a target
+    //////////////////////////////////////////////////////////////////////
+    bool isValid (const std::string target = "0")
+    {
+        if (target.find("..") != std::string::npos
+            || target.find("//") != std::string::npos
+            || target.at(0) != '/'
+            || target.length() < 2
+            || target.find("?") > target.find("&")
+            || target.find("&&") != std::string::npos
+            || target.find("??") != std::string::npos)
+        { return false; }
+
+        return true;
     }
 }

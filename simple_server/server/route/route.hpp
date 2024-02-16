@@ -19,9 +19,9 @@ namespace b_net {
     };
 
     class Route {
+        const std::string m_target;
         const std::vector<Method> m_methods;
         const bool m_all_methods;
-        const std::string m_target;
         const std::vector<Query> m_queries;
         const std::function<void(Request&, Response&)> m_handler;
 
@@ -37,7 +37,7 @@ namespace b_net {
             m_all_methods(hasAllMethod())
         { }
 
-        bool hasAllMethod()
+        bool hasAllMethod() const
         {
             for (const auto& elem : m_methods)
             {
@@ -46,21 +46,7 @@ namespace b_net {
             return false;
         }
 
-        bool isValid (const std::string target = "0")
-        {
-            if (target.find("..") != std::string::npos
-                || target.find("//") != std::string::npos
-                || target.at(0) != '/'
-                || target.length() < 2
-                || target.find("?") > target.find("&")
-                || target.find("&&") != std::string::npos
-                || target.find("??") != std::string::npos)
-            { return false; }
-
-            return true;
-        }
-
-        bool isTarget (std::string target)
+        bool isTarget(std::string target) const
         {
             // target must be pure - without query parameters
             if (target.find("?") != std::string::npos)
@@ -74,7 +60,7 @@ namespace b_net {
             return false;
         }
 
-        bool queriesExist (const std::list<ParsedField> parsed_queries)
+        bool queriesExist(const std::list<ParsedField> parsed_queries) const
         {
             bool found = false;
 
@@ -120,7 +106,8 @@ namespace b_net {
             return true;
         }
 
-        bool methodAllowed (const http::verb method) {
+        bool methodAllowed(const http::verb method) const
+        {
             if (m_all_methods)
                 return true;
 

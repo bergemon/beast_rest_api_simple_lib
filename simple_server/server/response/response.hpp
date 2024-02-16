@@ -164,11 +164,16 @@ namespace b_net {
                 (b_net::status::OK, "Body was filled with the file octets");
         }
 
-        // Set http header fields
+        // Set http header field. The value can be an empty string.
+        //It will replace last field with the same name.
+        // For purpose of setting another field with the same name use insert method.
         void set(std::string name, std::string value)
         {
             m_set_fields.push_back(Field(name, value));
         }
+        // Insert a field. If one or more fields with the same name already exist,
+        // the new field will be inserted after the last field with the matching name
+        // in serialization order. The value can be an empty string.
         void insert(std::string name, std::string value)
         {
             m_ins_fields.push_back(Field(name, value));

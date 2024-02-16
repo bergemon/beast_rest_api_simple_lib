@@ -18,8 +18,8 @@ namespace b_net {
         void set_threads(uint16_t threads) { m_threads = threads; }
         
         // Getters
-        uint16_t port() { return m_port; }
-        uint16_t threads() { return m_threads; }
+        const uint16_t port() const { return m_port; }
+        const uint16_t threads() const { return m_threads; }
     };
 
     // Server class that can handle request - check routes, queries and make response
@@ -27,21 +27,21 @@ namespace b_net {
     using Listener::Listener;
     class Server {
         // config settings
-        ParsedConfig m_config;
+        const ParsedConfig m_config;
         // other server class members
         const std::shared_ptr<asio::io_context> m_context;
-        std::shared_ptr<Listener> m_listener;
+        const std::shared_ptr<Listener> m_listener;
         std::vector<std::thread> m_threadsArray;
-        uint32_t m_threads;
-        // routes that would be handled
-        std::vector<b_net::Route> m_routes;
+        const uint32_t m_threads;
+        // root routes that would be handled
+        std::vector<b_net::RootRoute> m_root_routes;
 
     public:
         Server()
             : m_config(parse_config()),
             m_context(std::make_shared<asio::io_context>(m_config.threads())),
             m_threads(m_config.threads()),
-            m_listener(std::make_shared<Listener>(*m_context, tcp::endpoint{ tcp::v4(), m_config.port() }, m_routes))
+            m_listener(std::make_shared<Listener>(*m_context, tcp::endpoint{ tcp::v4(), m_config.port() }, m_root_routes))
         { }
 
         // Find server config file and create new if it is not exist
@@ -92,21 +92,36 @@ namespace b_net {
             return config_;
         }
 
-        // Put new route to handle by the server
-        void ROUTE (const std::vector<Method> methods,
+        // Create new root route
+        const RootRoute& ROOT_ROUTE(const std::string target)
+        {
+            m_root_routes.push_back(RootRoute(target));
+            return m_root_routes.back();
+        }
+        
+        // Create new root route that will be handle request by itself
+        // With queries
+        const RootRoute& ROOT_ROUTE(
+            const std::vector<Method> methods,
             const std::string target,
             const std::vector<Query> queries,
-            const std::function<void(Request&, Response&)> handler)
+            const std::function<void(Request&, Response&)> handler
+        )
         {
-            m_routes.push_back(Route{ methods, target, queries, handler });
+            m_root_routes.push_back(RootRoute(methods, target, queries, handler));
+            return m_root_routes.back();
         }
 
-        // Put new route to handle by the server
-        void ROUTE (const std::vector<Method> methods,
+        // Create new root route that will be handle request by itself
+        // Without queries
+        const RootRoute& ROOT_ROUTE(
+            const std::vector<Method> methods,
             const std::string target,
-            const std::function<void(Request&, Response&)> handler)
+            const std::function<void(Request&, Response&)> handler
+        )
         {
-            m_routes.push_back(Route{ methods, target, {}, handler });
+            m_root_routes.push_back(RootRoute(methods, target, {}, handler));
+            return m_root_routes.back();
         }
 
         // Run the server, start to listen incoming messages on the setted port

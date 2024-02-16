@@ -45,22 +45,31 @@ namespace b_net {
 
         // Request target, this method returns copy of the string
         std::string target() const { return m_target; }
+        
         // Version of http request, presented by 32 bit integer variable
         const uint32_t version() const { return m_version; }
+
         // Keep-Alive header field, presented by boolean variable
         const bool keep_alive() const { return m_keep_alive; }
+
         // Pointer to request body
         const char* body() const { return reinterpret_cast<const char*>(m_body); }
+
         // Size of the body in bytes
         size_t body_size() const { return m_body_size; }
+
         // List of parsed header fields names and it's values
         const std::list<ParsedField>& header_fields() const { return m_fields; }
+
         // List of parsed query parameters and it's values
         const std::list<ParsedField>& queries() const { return m_queries; }
+
         // List of parsed cookies and it's values
         const std::list<ParsedField>& cookies() const { return m_cookies; }
+
         // Request method
         Method method() const { return m_method; }
+
         // Extension of the request body (.jpg for example or .html)
         BodyType type() const { return m_type; }
 
