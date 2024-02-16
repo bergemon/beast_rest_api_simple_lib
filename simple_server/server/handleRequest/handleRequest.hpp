@@ -41,7 +41,7 @@ namespace HandleRequest {
         );
 
         // Check target - is it valid or not
-        if (utility_::isValid(target))
+        if (!utility_::isValid(target))
             return b_net_errs::bad_request(
                 "Bad request. Illegal request-target",
                 req_
@@ -55,11 +55,6 @@ namespace HandleRequest {
             // Handle request if it's target equal to root route
             if(rr.route().isTarget(target))
             {
-                // Check is target match the route
-                // Continue the loop if there no match
-                if(!rr.route().isTarget(target))
-                    continue;
-
                 // Check request method
                 if(!rr.route().methodAllowed(req.method()))
                 {
@@ -85,7 +80,7 @@ namespace HandleRequest {
                 return b_net::create_response(res, req.version(), req.keep_alive(), req.method());
             }
             // Nested loop for routes in root route
-            else if(!rr.is_root(target))
+            else if(rr.is_root(target))
             {
                 for (auto& route : rr.routes())
                 {

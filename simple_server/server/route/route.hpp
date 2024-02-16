@@ -48,6 +48,8 @@ namespace b_net {
 
         bool isTarget(std::string target) const
         {
+            std::cout << "Target: " << target << std::endl;
+            std::cout << "Route target: " << m_target << std::endl;
             // target must be pure - without query parameters
             if (target.find("?") != std::string::npos)
                 target = target.substr(0, target.find("?"));
