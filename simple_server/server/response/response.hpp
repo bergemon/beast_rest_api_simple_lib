@@ -37,7 +37,7 @@ namespace b_net {
         [[nodiscard]]
             std::list<Field>& insert_fields() { return m_ins_fields; }
         // Boost Beast response creator friendly function
-        friend http::message_generator create_response(Response&, const uint32_t, const bool, const http::verb);
+        friend http::message_generator create_response(Response&, const uint32_t, const bool, const Method);
 
         size_t check(const char* body = nullptr)
         {

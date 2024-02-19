@@ -3,7 +3,7 @@
 
 namespace b_net_errs {
     // Error codes returning
-    // Bad request
+    // Return bad request - 400
     http::message_generator
         bad_request
         (const std::string why, const b_net::Request& req)
@@ -19,7 +19,7 @@ namespace b_net_errs {
         res.prepare_payload();
         return res;
     };
-    // Not found
+    // Return not found error - 404
     http::message_generator
         not_found
         (const b_net::Request& req)
@@ -46,7 +46,7 @@ namespace b_net_errs {
         res.prepare_payload();
         return res;
     };
-    // Server error
+    // Return server error - 500
     http::message_generator
         server_error
         (const std::string what, const b_net::Request& req)

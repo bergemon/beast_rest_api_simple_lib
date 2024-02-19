@@ -6,13 +6,13 @@ namespace b_net {
         b_net::Response& b_net_res,
         const uint32_t version,
         const bool keep_alive,
-        const http::verb method
+        const Method method
     )
     {
         using namespace b_net;
 
         // Forming boost beast response class
-        if (b_net_res.get_size() > 0 && method != http::verb::head)
+        if (b_net_res.get_size() > 0 && method != HEAD)
         {
             http::response<http::buffer_body> res{http::status::ok, version};
             res.set(http::field::server, "Rest API by bergemon");

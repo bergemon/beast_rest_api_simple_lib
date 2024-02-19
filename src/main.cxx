@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
         << "WebSocket listener will run on the passed port plus five."
         << std::endl;
 
-    server.ROOT_ROUTE(
+    auto& o1 = server.ROOT_ROUTE(
         // Allowed methods<enum Method> for this route
         { GET, HEAD },
         // Route target<string>
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
         getUsers
     );
 
-    server.ROOT_ROUTE(
+    auto& o2 = server.ROOT_ROUTE(
         // Allowed methods<enum Method> for this route
         { GET, HEAD },
         // Route target<string>
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
         }
     );
 
-    server.ROOT_ROUTE(
+    auto& o3 = server.ROOT_ROUTE(
         // Allowed methods<enum Method> for this route
         { ALL, GET, HEAD },
         // Route target<string>
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
         }
     );
 
-    server.ROOT_ROUTE(
+    o3.ROUTE(
         // Allowed methods<enum Method> for this route
         { GET },
         // Route target<string>

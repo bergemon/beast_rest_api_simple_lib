@@ -93,34 +93,37 @@ namespace b_net {
         }
 
         // Create new root route
-        const RootRoute& ROOT_ROUTE(const std::string target)
+        // Warning! This method returns reference to the created object. Do not copy it!
+        [[nodiscard]] RootRoute& ROOT_ROUTE(const std::string target)
         {
-            m_root_routes.push_back(RootRoute(target));
+            m_root_routes.emplace_back(target);
             return m_root_routes.back();
         }
         
         // Create new root route that will be handle request by itself
         // With queries
-        const RootRoute& ROOT_ROUTE(
+        // Warning! This method returns reference to the created object. Do not copy it!
+        [[nodiscard]] RootRoute& ROOT_ROUTE(
             const std::vector<Method> methods,
             const std::string target,
             const std::vector<Query> queries,
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_root_routes.push_back(RootRoute(methods, target, queries, handler));
+            m_root_routes.emplace_back(methods, target, queries, handler);
             return m_root_routes.back();
         }
 
         // Create new root route that will be handle request by itself
         // Without queries
-        const RootRoute& ROOT_ROUTE(
+        // Warning! This method returns reference to the created object. Do not copy it!
+        [[nodiscard]] RootRoute& ROOT_ROUTE(
             const std::vector<Method> methods,
             const std::string target,
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_root_routes.push_back(RootRoute(methods, target, {}, handler));
+            m_root_routes.emplace_back(methods, target, handler);
             return m_root_routes.back();
         }
 
@@ -136,5 +139,7 @@ namespace b_net {
                 m_threadsArray.emplace_back([this] { m_context->run(); });
             m_context->run();
         }
+
+        const b_net::RootRoute& test(int32_t i) const { return m_root_routes[i]; }
     };
 }

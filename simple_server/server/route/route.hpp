@@ -37,7 +37,7 @@ namespace b_net {
             m_all_methods(hasAllMethod())
         { }
 
-        bool hasAllMethod() const
+        const bool hasAllMethod() const
         {
             for (const auto& elem : m_methods)
             {
@@ -46,23 +46,29 @@ namespace b_net {
             return false;
         }
 
-        bool isTarget(std::string target) const
+        const bool isTarget(const std::string target) const
         {
-            std::cout << "Target: " << target << std::endl;
-            std::cout << "Route target: " << m_target << std::endl;
+            return check_target(target, {});
+        }
+        const bool isTarget(const std::string target, const std::string root_target) const
+        {
+            return check_target(target, root_target);
+        }
+        const bool check_target(std::string target, const std::string root_target) const
+        {
             // target must be pure - without query parameters
             if (target.find("?") != std::string::npos)
                 target = target.substr(0, target.find("?"));
             if (target.at(target.length() - 1) == '/')
                 target = target.substr(0, target.length() - 1);
 
-            if (target == m_target)
+            if (target == root_target + m_target)
                 return true;
 
             return false;
         }
 
-        bool queriesExist(const std::list<ParsedField> parsed_queries) const
+        const bool queriesExist(const std::list<ParsedField> parsed_queries) const
         {
             bool found = false;
 
@@ -108,7 +114,7 @@ namespace b_net {
             return true;
         }
 
-        bool methodAllowed(const http::verb method) const
+        const bool methodAllowed(const http::verb method) const
         {
             if (m_all_methods)
                 return true;

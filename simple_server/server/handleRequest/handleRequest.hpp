@@ -9,6 +9,9 @@ namespace HandleRequest {
         std::vector<b_net::RootRoute>& root_routes
     )
     {
+        using namespace b_net;
+        using namespace b_net_errs;
+
         /////////////////////////////////////////////////
         // Initializing of custom b_net request class //
         ////////////////////////////////////////////////
@@ -23,7 +26,7 @@ namespace HandleRequest {
         std::list<ParsedField> cookies;
 
         // Construct custom b_net request class for the handler
-        b_net::Request req_(
+        Request req_(
             // Request target, version and keep alive field
             target, req.version(), req.keep_alive(),
             // Request body and it's size
@@ -42,57 +45,27 @@ namespace HandleRequest {
 
         // Check target - is it valid or not
         if (!utility_::isValid(target))
-            return b_net_errs::bad_request(
+            return bad_request(
                 "Bad request. Illegal request-target",
                 req_
             );
 
         // Handle incoming request
         for (auto& rr : root_routes) {
-            using namespace b_net;
-
-            // Check is target contains root route
-            // Handle request if it's target equal to root route
-            if(rr.route().isTarget(target))
-            {
-                // Check request method
-                if(!rr.route().methodAllowed(req.method()))
-                {
-                    return b_net_errs::bad_request(
-                        "Bad request. Method not allowed",
-                        req_
-                    );
-                }
-
-                // Check query parameters
-                if(!rr.route().queriesExist(req_.queries()))
-                {
-                    return b_net_errs::bad_request(
-                        "Bad request. Not allowed query parameter(s)",
-                        req_
-                    );
-                }
-
-                // Invoke route handler and get custom b_net response class
-                rr.route().handler()(req_, res.clear());
-
-                // Send response, we finally handle the request here
-                return b_net::create_response(res, req.version(), req.keep_alive(), req.method());
-            }
             // Nested loop for routes in root route
-            else if(rr.is_root(target))
+            if(rr.is_root(target))
             {
                 for (auto& route : rr.routes())
                 {
                     // Check is target match the route
                     // Continue the loop if there no match
-                    if(!route.isTarget(target))
+                    if(!route.isTarget(target, rr.target()))
                         continue;
 
                     // Check request method
                     if(!route.methodAllowed(req.method()))
                     {
-                        return b_net_errs::bad_request(
+                        return bad_request(
                             "Bad request. Method not allowed",
                             req_
                         );
@@ -101,7 +74,7 @@ namespace HandleRequest {
                     // Check query parameters
                     if(!route.queriesExist(req_.queries()))
                     {
-                        return b_net_errs::bad_request(
+                        return bad_request(
                             "Bad request. Not allowed query parameter(s)",
                             req_
                         );
@@ -111,11 +84,39 @@ namespace HandleRequest {
                     route.handler()(req_, res.clear());
 
                     // Send response, we finally handle the request here
-                    return b_net::create_response(res, req.version(), req.keep_alive(), req.method());
+                    return create_response(res, req_.version(), req_.keep_alive(), req_.method());
                 }
 
                 // If we not found request target aka route
-                return b_net_errs::not_found(req_);
+                return not_found(req_);
+            }
+            // Check is target contains root route
+            // Handle request if it's target equal to root route
+            else if(rr.route().isTarget(target))
+            {
+                // Check request method
+                if(!rr.route().methodAllowed(req.method()))
+                {
+                    return bad_request(
+                        "Bad request. Method not allowed",
+                        req_
+                    );
+                }
+
+                // Check query parameters
+                if(!rr.route().queriesExist(req_.queries()))
+                {
+                    return bad_request(
+                        "Bad request. Not allowed query parameter(s)",
+                        req_
+                    );
+                }
+
+                // Invoke route handler and get custom b_net response class
+                rr.route().handler()(req_, res.clear());
+
+                // Send response, we finally handle the request here
+                return create_response(res, req_.version(), req_.keep_alive(), req_.method());
             }
             // Continue the loop if we didn't find a match
             else
@@ -123,6 +124,6 @@ namespace HandleRequest {
         }
 
         // If we not found request target aka route
-        return b_net_errs::not_found(req_);
+        return not_found(req_);
     }
 }
