@@ -1,5 +1,5 @@
 #pragma once
-#include "../handleRequest/handleRequest.hpp"
+#include "../handleRequest/handle_request.hpp"
 
 namespace Session {
     // Handles an HTTP server connection
@@ -7,12 +7,12 @@ namespace Session {
         beast::tcp_stream m_stream;
         beast::flat_buffer m_buffer;
         std::optional<http::request_parser<http::dynamic_body>> m_parser;
-        std::vector<b_net::RootRoute>& m_root_routes;
+        std::vector<b_net::RoutesContainer>& m_routes;
         b_net::Response m_custom_response;
 
     public:
-        Session(tcp::socket&& socket, std::vector<b_net::RootRoute>& root_routes)
-            : m_stream(std::move(socket)), m_root_routes(root_routes)
+        Session(tcp::socket&& socket, std::vector<b_net::RoutesContainer>& root_routes)
+            : m_stream(std::move(socket)), m_routes(root_routes)
         { }
 
         ~Session() { m_custom_response.clear(); }
@@ -48,7 +48,7 @@ namespace Session {
                 HandleRequest::handle_request(
                     m_custom_response,
                     std::move(m_parser->get()),
-                    m_root_routes
+                    m_routes
                 )
             );
         }

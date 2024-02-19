@@ -5,11 +5,11 @@ namespace Listener {
     class Listener : public std::enable_shared_from_this<Listener> {
         asio::io_context& m_context;
         tcp::acceptor m_acceptor;
-        std::vector<b_net::RootRoute>& m_root_routes;
+        std::vector<b_net::RoutesContainer>& m_routes;
 
     public:
-        Listener(asio::io_context& context, tcp::endpoint endpoint, std::vector<b_net::RootRoute>& root_routes)
-            : m_context(context), m_acceptor(asio::make_strand(m_context)), m_root_routes(root_routes)
+        Listener(asio::io_context& context, tcp::endpoint endpoint, std::vector<b_net::RoutesContainer>& root_routes)
+            : m_context(context), m_acceptor(asio::make_strand(m_context)), m_routes(root_routes)
         {
             beast::error_code ec;
 
@@ -56,7 +56,7 @@ namespace Listener {
             }
             else
             {
-                std::make_shared<Session::Session>(std::move(socket), m_root_routes)->run();
+                std::make_shared<Session::Session>(std::move(socket), m_routes)->run();
             }
 
             do_accept();

@@ -18,7 +18,7 @@ namespace b_net {
         bool isRequired () const { return m_required; }
     };
 
-    class Route {
+    class RouteHandler {
         const std::string m_target;
         const std::vector<Method> m_methods;
         const bool m_all_methods;
@@ -26,7 +26,7 @@ namespace b_net {
         const std::function<void(Request&, Response&)> m_handler;
 
     public:
-        Route(
+        RouteHandler(
             const std::vector<Method> methods,
             const std::string target,
             const std::vector<Query> queries,
@@ -46,15 +46,7 @@ namespace b_net {
             return false;
         }
 
-        const bool isTarget(const std::string target) const
-        {
-            return check_target(target, {});
-        }
-        const bool isTarget(const std::string target, const std::string root_target) const
-        {
-            return check_target(target, root_target);
-        }
-        const bool check_target(std::string target, const std::string root_target) const
+        const bool isTarget(std::string target, const std::string nested_target) const
         {
             // target must be pure - without query parameters
             if (target.find("?") != std::string::npos)
@@ -62,7 +54,10 @@ namespace b_net {
             if (target.at(target.length() - 1) == '/')
                 target = target.substr(0, target.length() - 1);
 
-            if (target == root_target + m_target)
+            std::cout << "Target: " << target << std::endl;
+            std::cout << "Nested target: " << nested_target << std::endl;
+            std::cout << "Accumulated target: " << nested_target + m_target << std::endl;
+            if (target == nested_target + m_target)
                 return true;
 
             return false;
@@ -114,24 +109,14 @@ namespace b_net {
             return true;
         }
 
-        const bool methodAllowed(const http::verb method) const
+        const bool methodAllowed(const Method req_method) const
         {
             if (m_all_methods)
                 return true;
 
             for (const auto& elem : m_methods)
             {
-                if (elem == Method::HEAD && method == http::verb::head)
-                    return true;
-                if (elem == Method::GET && method == http::verb::get)
-                    return true;
-                if (elem == Method::POST && method == http::verb::post)
-                    return true;
-                if (elem == Method::PUT && method == http::verb::put)
-                    return true;
-                if (elem == Method::DELETE_ && method == http::verb::delete_)
-                    return true;
-                if (elem == Method::PATCH && method == http::verb::patch)
+                if (elem == req_method)
                     return true;
             }
 

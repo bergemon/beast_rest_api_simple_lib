@@ -34,14 +34,14 @@ namespace b_net {
         std::vector<std::thread> m_threadsArray;
         const uint32_t m_threads;
         // root routes that would be handled
-        std::vector<b_net::RootRoute> m_root_routes;
+        std::vector<b_net::RoutesContainer> m_routes;
 
     public:
         Server()
             : m_config(parse_config()),
             m_context(std::make_shared<asio::io_context>(m_config.threads())),
             m_threads(m_config.threads()),
-            m_listener(std::make_shared<Listener>(*m_context, tcp::endpoint{ tcp::v4(), m_config.port() }, m_root_routes))
+            m_listener(std::make_shared<Listener>(*m_context, tcp::endpoint{ tcp::v4(), m_config.port() }, m_routes))
         { }
 
         // Find server config file and create new if it is not exist
@@ -94,37 +94,37 @@ namespace b_net {
 
         // Create new root route
         // Warning! This method returns reference to the created object. Do not copy it!
-        [[nodiscard]] RootRoute& ROOT_ROUTE(const std::string target)
+        [[nodiscard]] RoutesContainer& ROOT_ROUTE(const std::string target)
         {
-            m_root_routes.emplace_back(target);
-            return m_root_routes.back();
+            m_routes.emplace_back(target, 0);
+            return m_routes.back();
         }
         
         // Create new root route that will be handle request by itself
         // With queries
         // Warning! This method returns reference to the created object. Do not copy it!
-        [[nodiscard]] RootRoute& ROOT_ROUTE(
+        [[nodiscard]] RoutesContainer& ROOT_ROUTE(
             const std::vector<Method> methods,
             const std::string target,
             const std::vector<Query> queries,
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_root_routes.emplace_back(methods, target, queries, handler);
-            return m_root_routes.back();
+            m_routes.emplace_back(methods, target, queries, handler, 0);
+            return m_routes.back();
         }
 
         // Create new root route that will be handle request by itself
         // Without queries
         // Warning! This method returns reference to the created object. Do not copy it!
-        [[nodiscard]] RootRoute& ROOT_ROUTE(
+        [[nodiscard]] RoutesContainer& ROOT_ROUTE(
             const std::vector<Method> methods,
             const std::string target,
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_root_routes.emplace_back(methods, target, handler);
-            return m_root_routes.back();
+            m_routes.emplace_back(methods, target, handler, 0);
+            return m_routes.back();
         }
 
         // Run the server, start to listen incoming messages on the setted port
@@ -139,7 +139,5 @@ namespace b_net {
                 m_threadsArray.emplace_back([this] { m_context->run(); });
             m_context->run();
         }
-
-        const b_net::RootRoute& test(int32_t i) const { return m_root_routes[i]; }
     };
 }

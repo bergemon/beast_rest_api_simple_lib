@@ -35,7 +35,7 @@ int main(int argc, char** argv) {
             b_net::Request& req,
             b_net::Response& res
         ) {
-            b_net::error_code ec = res.file_body("image2.png");
+            b_net::error_code ec = res.file_body("image.jpg");
             if (ec.get_status() != b_net::status::OK) {
                 std::cerr << ec.message() << std::endl;
             }
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
         }
     );
 
-    o3.ROUTE(
+    auto& o4 = o3.SUB_ROUTE(
         // Allowed methods<enum Method> for this route
         { GET },
         // Route target<string>
@@ -96,6 +96,17 @@ int main(int argc, char** argv) {
             }
 
             res.body("{\"status\": \"ok\"}", JSON);
+        }
+    );
+
+    auto& o5 = o4.SUB_ROUTE(
+        { ALL },
+        "/hello",
+        [&](
+            b_net::Request& req,
+            b_net::Response& res
+        ) {
+            res.body("it works!", TEXT);
         }
     );
 
