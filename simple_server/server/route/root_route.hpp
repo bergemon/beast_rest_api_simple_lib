@@ -59,7 +59,7 @@ namespace b_net {
             const std::function<void(Request&, Response&)> handler
         )
             : m_root_target(target)
-        { m_root_route.emplace(Route(methods, target, queries, handler)); }
+        { m_root_route.emplace(methods, target, queries, handler); }
 
         // Root route without queries
         RootRoute(
@@ -68,7 +68,7 @@ namespace b_net {
             const std::function<void(Request&, Response&)> handler
         )
             : m_root_target(target)
-        { m_root_route.emplace(Route(methods, target, {}, handler)); }
+        { m_root_route.emplace(methods, target, std::vector<Query>(), handler); }
 
         ////////////////////////////////////////////
         // METHODS
@@ -83,7 +83,7 @@ namespace b_net {
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_root_route.emplace(Route(methods, target, queries, handler));
+            m_root_route.emplace(methods, target, queries, handler);
         }
         // Set root route handler without queries
         void SET_HANDLER(
@@ -92,7 +92,7 @@ namespace b_net {
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_root_route.emplace(Route(methods, target, {}, handler));
+            m_root_route.emplace(methods, target, std::vector<Query>(), handler);
         }
 
         // New routes of these root route
@@ -104,7 +104,7 @@ namespace b_net {
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_routes.push_back(Route{ methods, target, queries, handler });
+            m_routes.emplace_back(methods, target, queries, handler);
             return m_routes.back();
         }
         // Put new route to handle by the server (without queries)
@@ -114,7 +114,7 @@ namespace b_net {
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_routes.push_back(Route{ methods, target, {}, handler });
+            m_routes.emplace_back(methods, target, std::vector<Query>(), handler);
             return m_routes.back();
         }
 

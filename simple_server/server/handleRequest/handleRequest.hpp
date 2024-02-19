@@ -52,8 +52,36 @@ namespace HandleRequest {
 
         // Handle incoming request
         for (auto& rr : root_routes) {
+            // Check is target contains root route
+            // Handle request if it's target equal to root route
+            if(rr.route().isTarget(target))
+            {
+                // Check request method
+                if(!rr.route().methodAllowed(req.method()))
+                {
+                    return bad_request(
+                        "Bad request. Method not allowed",
+                        req_
+                    );
+                }
+
+                // Check query parameters
+                if(!rr.route().queriesExist(req_.queries()))
+                {
+                    return bad_request(
+                        "Bad request. Not allowed query parameter(s)",
+                        req_
+                    );
+                }
+
+                // Invoke route handler and get custom b_net response class
+                rr.route().handler()(req_, res.clear());
+
+                // Send response, we finally handle the request here
+                return create_response(res, req_.version(), req_.keep_alive(), req_.method());
+            }
             // Nested loop for routes in root route
-            if(rr.is_root(target))
+            else if(rr.is_root(target))
             {
                 for (auto& route : rr.routes())
                 {
@@ -89,34 +117,6 @@ namespace HandleRequest {
 
                 // If we not found request target aka route
                 return not_found(req_);
-            }
-            // Check is target contains root route
-            // Handle request if it's target equal to root route
-            else if(rr.route().isTarget(target))
-            {
-                // Check request method
-                if(!rr.route().methodAllowed(req.method()))
-                {
-                    return bad_request(
-                        "Bad request. Method not allowed",
-                        req_
-                    );
-                }
-
-                // Check query parameters
-                if(!rr.route().queriesExist(req_.queries()))
-                {
-                    return bad_request(
-                        "Bad request. Not allowed query parameter(s)",
-                        req_
-                    );
-                }
-
-                // Invoke route handler and get custom b_net response class
-                rr.route().handler()(req_, res.clear());
-
-                // Send response, we finally handle the request here
-                return create_response(res, req_.version(), req_.keep_alive(), req_.method());
             }
             // Continue the loop if we didn't find a match
             else
