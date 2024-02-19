@@ -50,15 +50,19 @@ namespace b_net {
         {
             // target must be pure - without query parameters
             if (target.find("?") != std::string::npos)
+            {
                 target = target.substr(0, target.find("?"));
-            if (target.at(target.length() - 1) == '/')
-                target = target.substr(0, target.length() - 1);
+            }
 
-            std::cout << "Target: " << target << std::endl;
-            std::cout << "Nested target: " << nested_target << std::endl;
-            std::cout << "Accumulated target: " << nested_target + m_target << std::endl;
+            if (target.at(target.length() - 1) == '/')
+            {
+                target = target.substr(0, target.length() - 1);
+            }
+
             if (target == nested_target + m_target)
+            {
                 return true;
+            }
 
             return false;
         }

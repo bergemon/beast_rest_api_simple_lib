@@ -61,10 +61,7 @@ namespace b_net {
                 }
                 parsed_target = parsed_target.substr(0, pos);
             }
-
-            std::cout << "\n\nParsed target: " << parsed_target << std::endl;
-            std::cout << "Route nest: " << m_route_nest << std::endl;
-            std::cout << "Root target: " << m_target << "\n\n" << std::endl;
+            
             return parsed_target == m_target;
         }
 
