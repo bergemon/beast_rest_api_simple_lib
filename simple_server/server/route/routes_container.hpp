@@ -87,7 +87,7 @@ namespace b_net {
             const uint32_t nesting
         )
             : m_target(target), m_route_nest(nesting)
-        { m_route_handler.emplace(RouteHandler(methods, target, queries, handler)); }
+        { m_route_handler.emplace(methods, target, queries, handler); }
 
         // Root route without queries
         RoutesContainer(
@@ -97,7 +97,7 @@ namespace b_net {
             const uint32_t nesting
         )
             : m_target(target), m_route_nest(nesting)
-        { m_route_handler.emplace(RouteHandler(methods, target, {}, handler)); }
+        { m_route_handler.emplace(methods, target, std::vector<Query>(), handler); }
 
         ////////////////////////////////////////////
         // METHODS
@@ -111,7 +111,7 @@ namespace b_net {
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_route_handler.emplace(RouteHandler(methods, m_target, queries, handler));
+            m_route_handler.emplace(methods, m_target, queries, handler);
         }
         // Set root route handler without queries
         void SET_HANDLER(
@@ -119,7 +119,7 @@ namespace b_net {
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_route_handler.emplace(RouteHandler(methods, m_target, {}, handler));
+            m_route_handler.emplace(methods, m_target, std::vector<Query>(), handler);
         }
 
         // New routes of these root route
