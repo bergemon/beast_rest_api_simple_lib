@@ -82,7 +82,7 @@ b_net has no any limits to route nesting. You can have any level of nesting rout
 
 ### Static files
 
-You can set static files to the route if it return html file and browser will do new requests to get them. Here is an example how to do it below:
+You can set static files to the route if it returns an html file and the browser will make new requests to get them. Here is an example how to do it:
 
 ```
 #include "simple_server/server.hpp"
