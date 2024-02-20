@@ -1,4 +1,4 @@
-# Simple library to handle incoming request - b_net
+# Simple library to handle incoming requests - b_net
 
 ## Can be used not only for the Rest API - you can also set static files to the created routes
 
@@ -7,7 +7,7 @@
 You can simply create a route like it's written below:
 
 ```
-#include "simple_server/server.hpp"#
+#include "simple_server/server.hpp"
 
 b_net::Server server;
 
@@ -34,7 +34,7 @@ Beware of copying returning object. Return it to a reference.
 
 *route target, presented by std::string*
 
-*handler with signature **std::function<void>(b_net::Requst&, b_net::Response)***
+*handler with signature **std::function<void>(b_net::Request&, b_net::Response)***
 
 As you have seen handler does not returning any value. You need to set response fields and body by using b_net::Response methods.
 
@@ -43,8 +43,8 @@ As you have seen handler does not returning any value. You need to set response 
 This route will handle request to "/image/file/" target
 
 ```
-auto& avatar_image = image_route.SUB_ROUTE(
-    { GET },
+auto& file_route = image_route.SUB_ROUTE(
+    { POST },
     "/file",
     [&](
         b_net::Request& req,
@@ -62,3 +62,21 @@ auto& avatar_image = image_route.SUB_ROUTE(
     }
 );
 ```
+
+**b_net::Request object have such fields:**
+
+*http request fields*
+
+*body and it's size in bytes*
+
+*cookies*
+
+*request method*
+
+*request queries*
+
+*request target*
+
+*body type - by conversing from http field "Content-Type" to b_net::BodyType enum value*
+
+*http request protocol version in uint32_t*
