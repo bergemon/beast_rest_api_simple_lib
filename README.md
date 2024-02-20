@@ -7,10 +7,10 @@
 </h2>
 
 <div style="display: flex; gap: 10px; flex-diration: column">
-    <h3 align="center" style="font-size: 15px">Quick Start:</h3>
-    <p style="font-size: 10px">
-        You can simply create a route like it's written below
-    </p>
+<h3 align="center" style="font-size: 15px">Quick Start:</h3>
+<p style="font-size: 10px">
+    You can simply create a route like it's written below
+</p>
 
         #include "simple_server/server.hpp"
 
@@ -30,20 +30,20 @@
             }
         );
 
-    <p style="font-size: 10px">
-        Beware of copying returning object. Return it to a reference.
-        Arguments of the ROOT_ROUTE method are:
-        std::vector containing b_net::Method objects
-        route target, presented by std::string
-        handler with signature std::function<void>(b_net::Requst&, b_net::Response)
+<p style="font-size: 10px">
+    Beware of copying returning object. Return it to a reference.
+    Arguments of the ROOT_ROUTE method are:
+    std::vector containing b_net::Method objects
+    route target, presented by std::string
+    handler with signature std::function<void>(b_net::Requst&, b_net::Response)
 
-        As you have seen handler does not returning any value. You need to set
-        response fields and body by using b_net::Response methods.
-    </p>
-    <p style="font-size: 10px">
-        Then you can create a nested route aka sub route as written below.
-        This route will handle request to "/image/file/" target
-    </p>
+    As you have seen handler does not returning any value. You need to set
+    response fields and body by using b_net::Response methods.
+</p>
+<p style="font-size: 10px">
+    Then you can create a nested route aka sub route as written below.
+    This route will handle request to "/image/file/" target
+</p>
 
         auto& avatar_image = image_route.SUB_ROUTE(
             { GET },
