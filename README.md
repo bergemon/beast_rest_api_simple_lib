@@ -1,8 +1,8 @@
-#Simple library to handle incoming request - b_net#
+# Simple library to handle incoming request - b_net
 
-##Can be used not only for the Rest API - you can also set static files to the created routes##
+## Can be used not only for the Rest API - you can also set static files to the created routes
 
-###Quick Start:###
+### Quick Start:
 
 You can simply create a route like it's written below:
 
@@ -38,7 +38,7 @@ Beware of copying returning object. Return it to a reference.
 
 As you have seen handler does not returning any value. You need to set response fields and body by using b_net::Response methods.
 
-###Then you can create a nested route aka sub route as written below.
+### Then you can create a nested route aka sub route as written below.
 
 This route will handle request to "/image/file/" target
 
