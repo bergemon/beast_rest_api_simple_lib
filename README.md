@@ -31,16 +31,16 @@
         );
 
 <p style="font-size: 10px">
-    Beware of copying returning object. Return it to a reference.
-    Arguments of the ROOT_ROUTE method are:
-    <div style="display: flex; flex-direction: column; gap: 5px">
-        <span>std::vector containing b_net::Method objects</span>
-        <span>route target, presented by std::string</span>
-        <span>handler with signature std::function<void>(b_net::Requst&, b_net::Response)</span>
-    </div>
+Beware of copying returning object. Return it to a reference.
+Arguments of the ROOT_ROUTE method are:
+<div style="display: flex; flex-direction: column; gap: 5px">
+<p>std::vector containing b_net::Method objects</p>
+<p>route target, presented by std::string</p>
+<p>handler with signature std::function<void>(b_net::Requst&, b_net::Response)</p>
+</div>
 
-    As you have seen handler does not returning any value. You need to set
-    response fields and body by using b_net::Response methods.
+As you have seen handler does not returning any value. You need to set
+response fields and body by using b_net::Response methods.
 </p>
 <p style="font-size: 10px">
     Then you can create a nested route aka sub route as written below.
