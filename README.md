@@ -29,11 +29,8 @@ auto& image_route = server.ROOT_ROUTE(
 Beware of copying returning object. Return it to a reference.
 
 **Arguments of the ROOT_ROUTE method are:**
-
 *std::vector containing b_net::Method objects*
-
 *route target, presented by std::string*
-
 *handler with signature **std::function<void>(b_net::Request&, b_net::Response)***
 
 As you have seen handler does not returning any value. You need to set response fields and body by using b_net::Response methods.
@@ -66,17 +63,10 @@ auto& file_route = image_route.SUB_ROUTE(
 **b_net::Request object have such fields:**
 
 *http request fields*
-
 *body and it's size in bytes*
-
 *cookies*
-
 *request method*
-
 *request queries*
-
 *request target*
-
 *body type - by conversing from http field "Content-Type" to b_net::BodyType enum value*
-
 *http request protocol version in uint32_t*
