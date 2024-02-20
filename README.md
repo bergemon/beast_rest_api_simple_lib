@@ -11,26 +11,24 @@
     <p style="font-size: 10px">
         You can simply create a route like it's written below
     </p>
-    `
-        #include \"simple_server/server.hpp\"
+    `\#include "simple_server/server.hpp"
 
-        b_net::Server server;
+    b_net::Server server;
 
-        auto& image_route_1 = server.ROOT_ROUTE(
-            // Allowed methods<enum Method> for this route
-            { GET, HEAD },
-            // Route target<string>
-            "/image",
-            // Route handler
-            [&](
-                b_net::Request& req,
-                b_net::Response& res
-            ) {
-                b_net::error_code ec = res.file_body("image.jpg");
-                if (ec.get_status() != b_net::status::OK) {
-                    std::cerr << ec.message() << std::endl;
-                }
+    auto& image_route_1 = server.ROOT_ROUTE(
+        // Allowed methods<enum Method> for this route
+        { GET, HEAD },
+        // Route target<string>
+        "/image",
+        // Route handler
+        [&](
+            b_net::Request& req,
+            b_net::Response& res
+        ) {
+            b_net::error_code ec = res.file_body("image.jpg");
+            if (ec.get_status() != b_net::status::OK) {
+                std::cerr << ec.message() << std::endl;
             }
-        );
-    `
+        }
+    );`
 </div>
