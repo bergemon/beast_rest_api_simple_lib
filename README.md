@@ -130,7 +130,11 @@ Handler has two parameters - b_net::Request& and b_net::Response& object. This l
 
 ### Nesting
 
-b_net has no any limits to route nesting. You can have any level of nesting routes. Library provides easily customized routes for you as developer.
+Library hasn't any limits to route nesting. You can have any level of nesting routes. Library provides easily customized routes for you as developer.
+
+### TLS (https)
+
+Library doesn't provide HTTPS requests and responses. It needs a proxy, like nginx for example if you want to use TLS.
 
 ### Static files
 
