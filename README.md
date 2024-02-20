@@ -4,6 +4,9 @@
 
 ### Quick Start:
 
+> [!IMPORTANT]
+> Library is not completed yet. The only directory you need to write a server is simple_server catalog!**
+
 You can simply create a route like it's written below:
 
 ```
