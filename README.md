@@ -5,6 +5,9 @@
 > [!IMPORTANT]
 > Library is not completed yet. The only directory you need to write a server is simple_server catalog.
 
+> [!NOTE]
+> This library uses boost.asio and boost.beast as a dependencies!
+
 ### Quick Start:
 
 You can simply create a route like it's written below:
