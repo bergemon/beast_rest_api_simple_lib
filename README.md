@@ -5,7 +5,7 @@
 ### Quick Start:
 
 > [!IMPORTANT]
-> Library is not completed yet. The only directory you need to write a server is simple_server catalog!
+> Library is not completed yet. The only directory you need to write a server is simple_server catalog.
 
 You can simply create a route like it's written below:
 
@@ -29,6 +29,7 @@ auto& image_route = server.ROOT_ROUTE(
 );
 ```
 
+> [!WARNING]
 > Beware of copying returning object. Return it to a reference.
 
 **Arguments of the ROOT_ROUTE method are:**
