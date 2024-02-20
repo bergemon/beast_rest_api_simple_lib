@@ -6,7 +6,8 @@
 
 You can simply create a route like it's written below:
 
-`#include "simple_server/server.hpp"
+```
+#include "simple_server/server.hpp"
 
 b_net::Server server;
 
@@ -22,7 +23,8 @@ auto& image_route = server.ROOT_ROUTE(
             std::cerr << ec.message() << std::endl;
         }
     }
-);`
+);
+```
 
 Beware of copying returning object. Return it to a reference.
 
@@ -40,7 +42,8 @@ As you have seen handler does not returning any value. You need to set response 
 
 This route will handle request to "/image/file/" target
 
-`auto& avatar_image = image_route.SUB_ROUTE(
+```
+auto& avatar_image = image_route.SUB_ROUTE(
     { GET },
     "/file",
     [&](
@@ -57,4 +60,5 @@ This route will handle request to "/image/file/" target
 
         res.body("{\"status\": \"ok\"}", JSON);
     }
-);`
+);
+```
