@@ -13,7 +13,9 @@ namespace b_net {
         {
             return b_net_errs::bad_request(
                 "Bad request. Method not allowed",
-                req
+                req.version(),
+                req.keep_alive(),
+                req.method()
             );
         }
 
@@ -22,12 +24,21 @@ namespace b_net {
         {
             return b_net_errs::bad_request(
                 "Bad request. Not allowed query parameter(s)",
-                req
+                req.version(),
+                req.keep_alive(),
+                req.method()
             );
         }
 
         // Invoke route handler and get custom b_net response class
-        route.handler()(req, res.clear());
+        try
+        {
+            route.handler()(req, res.clear());
+        }
+        catch (const std::exception& e)
+        {
+            return b_net_errs::static_file_not_found(req, e.what());
+        }
 
         // Send response, we finally handle the request here
         return create_response(res, req.version(), req.keep_alive(), req.method());

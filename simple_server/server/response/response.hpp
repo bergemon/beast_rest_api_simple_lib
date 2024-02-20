@@ -128,7 +128,7 @@ namespace b_net {
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // file body, write a path to the file
-        [[nodiscard]] b_net::error_code file_body(std::string path)
+        [[nodiscard]] b_net::error_code file_body(const std::string path)
         {
             std::filesystem::path p(path);
 

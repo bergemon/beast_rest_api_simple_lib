@@ -17,6 +17,31 @@ namespace HandleRequest {
 
         // Declare variables here to prevent copying of them
         const std::string target = beast_req.target();
+
+        // Check target - is it valid or not
+        if (!utility_::isValid(target))
+        {
+            return b_net_errs::bad_request(
+                "Bad request. Illegal request-target",
+                beast_req.version(),
+                beast_req.keep_alive(),
+                utility_::convert_method(beast_req.method())
+            );
+        }
+
+        // Redirrect, if there is no slash at the end of the target
+        if(
+            target.at(target.length() - 1) != '/'
+            && target.find(".") == std::string::npos
+        )
+        {
+            return b_net_errs::incorrect_ending_of_target(
+                target,
+                beast_req.version(),
+                beast_req.keep_alive()
+            );
+        }
+
         std::list<ParsedField> queries;
         // Declare and get header fields
         std::list<ParsedField> header_fields;
@@ -42,31 +67,25 @@ namespace HandleRequest {
             utility_::mimeType_to_bodyType(utility_::parse_bodyType(beast_req.base()))
         );
 
-        // Check target - is it valid or not
-        if (!utility_::isValid(target))
-            return b_net_errs::bad_request(
-                "Bad request. Illegal request-target",
-                req
-            );
-
         // Handle incoming request
         std::string nested_target{ "" };
         const std::vector<RoutesContainer>* current_iterable_container = &routes_containers;
         bool new_loop;
 
-        while(true)
+        while (true)
         {
             new_loop = false;
 
             for (auto& route : *current_iterable_container) {
                 // Check if target is equal to current nesting route
                 // And handle request if it's equal
-                if(route.handler().isTarget(target, nested_target))
+                if (route.handler().isTarget(target, nested_target))
                 {
                     return handle_route(req, res, route.handler());
                 }
+
                 // Nested loop for subroutes in routes container
-                else if(route.is_root(target))
+                if (route.is_root(target))
                 {
                     nested_target += route.target();
                     current_iterable_container = &route.sub_routes();
@@ -75,7 +94,7 @@ namespace HandleRequest {
                 }
             }
 
-            if(!new_loop)
+            if (!new_loop)
                 break;
         }
 

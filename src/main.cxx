@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv) {
 #ifdef _WIN32
-    setlocale(LC_ALL, "Rus");
+    system("chcp 1251 > nul");
 #endif
 
     std::cout << "Pet REST API by bergemon ver. "
@@ -14,7 +14,7 @@ int main(int argc, char** argv) {
         << "WebSocket listener will run on the passed port plus five."
         << std::endl;
 
-    auto& o1 = server.ROOT_ROUTE(
+    auto& users_route_1 = server.ROOT_ROUTE(
         // Allowed methods<enum Method> for this route
         { GET, HEAD },
         // Route target<string>
@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
         getUsers
     );
 
-    auto& o2 = server.ROOT_ROUTE(
+    auto& image_route_1 = server.ROOT_ROUTE(
         // Allowed methods<enum Method> for this route
         { GET, HEAD },
         // Route target<string>
@@ -42,7 +42,7 @@ int main(int argc, char** argv) {
         }
     );
 
-    auto& o3 = server.ROOT_ROUTE(
+    auto& test_route_1 = server.ROOT_ROUTE(
         // Allowed methods<enum Method> for this route
         { ALL, GET, HEAD },
         // Route target<string>
@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
         }
     );
 
-    auto& o4 = o3.SUB_ROUTE(
+    auto& file_route_2 = test_route_1.SUB_ROUTE(
         // Allowed methods<enum Method> for this route
         { GET },
         // Route target<string>
@@ -99,16 +99,22 @@ int main(int argc, char** argv) {
         }
     );
 
-    auto& o5 = o4.SUB_ROUTE(
+    const std::string website_catalog{ "website/" };
+
+    auto& hello_route_3 = file_route_2.SUB_ROUTE(
         { ALL },
         "/hello",
         [&](
             b_net::Request& req,
             b_net::Response& res
         ) {
-            res.body("it works!", TEXT);
+            b_net::error_code ec = res.file_body(website_catalog + "index.html");
+
+            if(ec.error())
+                std::cout << ec.message() << std::endl;
         }
     );
+    hello_route_3.static_file(website_catalog + "main.css");
 
     server.run();
 

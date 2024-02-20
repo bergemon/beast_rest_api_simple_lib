@@ -145,6 +145,30 @@ namespace b_net {
             return m_routes.back();
         }
 
+        // Subroutes for static files
+        void static_file(const std::string path)
+        {
+            using namespace b_net;
+
+            const std::string target{ path.substr((path.rfind("/") == std::string::npos) ? 0 : (path.rfind("/") + 1)) };
+
+            m_routes.emplace_back(
+                std::vector<Method>({ GET }),
+                std::string('/' + target),
+                std::vector<Query>(),
+                std::function<void(Request&, Response&)>(
+                    [path, target](Request& req, Response& res) -> void
+                    {
+                        error_code ec = res.file_body(path);
+
+                        if(ec.error())
+                            throw std::runtime_error("File " + target + " not found");
+                    }
+                ),
+                m_route_nest + 1
+            );
+        }
+
         // Get root target
         const std::string& target() const { return m_target; }
 

@@ -43,3 +43,6 @@ using b_net::Method::PATCH;
 
 // Parameters for handler prototype
 using b_net::ParsedField;
+
+// Error code custom class
+using b_net::status;

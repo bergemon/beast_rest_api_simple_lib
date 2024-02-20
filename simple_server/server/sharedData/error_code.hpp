@@ -29,6 +29,10 @@ namespace b_net {
         }
 
         // Getters
+        bool error() const
+        {
+            return bool(int(m_status));
+        }
         status get_status() const { return m_status; }
         const char* message() const { return m_message; }
     };
