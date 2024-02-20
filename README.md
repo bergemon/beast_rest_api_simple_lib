@@ -11,7 +11,8 @@
     <p style="font-size: 10px">
         You can simply create a route like it's written below
     </p>
-    <div>`
+    <div>
+    `
         #include "simple_server/server.hpp"
 
         b_net::Server server;
@@ -32,5 +33,6 @@
                 }
             }
         );
-    `</div>
+    `
+    </div>
 </div>
