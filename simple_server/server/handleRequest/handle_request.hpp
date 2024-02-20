@@ -98,7 +98,7 @@ namespace HandleRequest {
                 break;
         }
 
-        // If we not found request target aka route
+        // If we have not found request target aka route
         return b_net_errs::not_found(req);
     }
 }
