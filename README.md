@@ -11,7 +11,7 @@
     <p style="font-size: 10px">
         You can simply create a route like it's written below
     </p>
-    `include "simple_server/server.hpp"
+    `#include simple_server/server.hpp
 
     b_net::Server server;
 
