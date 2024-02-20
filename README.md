@@ -11,7 +11,6 @@
     <p style="font-size: 10px">
         You can simply create a route like it's written below
     </p>
-    <div>
     `
         #include "simple_server/server.hpp"
 
@@ -34,5 +33,4 @@
             }
         );
     `
-    </div>
 </div>
