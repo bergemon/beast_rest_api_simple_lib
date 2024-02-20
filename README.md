@@ -2,10 +2,10 @@
 
 ## Can be used not only for the Rest API - you can also set static files to the created routes
 
-### Quick Start:
-
 > [!IMPORTANT]
 > Library is not completed yet. The only directory you need to write a server is simple_server catalog.
+
+### Quick Start:
 
 You can simply create a route like it's written below:
 
@@ -30,12 +30,13 @@ auto& image_route = server.ROOT_ROUTE(
 ```
 
 > [!WARNING]
-> Beware of copying returning object. Return it to a reference.
+> Beware of copying returning object. Return it to a reference. Boost Beast library, that used as a dependency, prohibit to delete copying constructors. And i don't know how to bypass it for now.
 
 **Arguments of the ROOT_ROUTE method are:**
 
 + *std::vector containing b_net::Method objects*
 + *route target, presented by std::string*
++ *route queries in std::vector, each has it's name and value*
 + *handler with signature **std::function<void>(b_net::Request&, b_net::Response)***
 
 As you have seen handler does not returning any value. You need to set response fields and body by using b_net::Response methods.
@@ -65,6 +66,50 @@ auto& file_route = image_route.SUB_ROUTE(
 );
 ```
 
+### Route queries
+
+You can set queries to the route and set is it required or not. You don't need to insert queries into the method when creating the route - it's not necessary.
+In future releases you will be able to set queries value types. It is uselees to set query value type for now but it's not necessary.
+
+> [!IMPORTANT]
+> If you don't insert any queries in route creator methods, then your route will not have any queries and client can't request target that will contain any queries!
+
+Here is an example how to create a route with queries, how to get the request queries and handle them:
+```
+#include "simple_server/server.hpp"
+
+b_net::Server server;
+
+auto& users_route = server.ROOT_ROUTE(
+    { GET, HEAD },
+    "/users",
+    { {"min", true, INT_}, {"max", true, INT_} },
+    [&](
+        b_net::Request& req,
+        b_net::Response& res
+    ) {
+        int min, max;
+        for (const auto& elem : req.queries()) {
+            if (elem.name() == "min") {
+                min = std::atoi(elem.value().c_str());
+            }
+            if (elem.name() == "max") {
+                max = std::atoi(elem.value().c_str());
+            }
+        }
+
+        std::stringstream ss;
+
+        ss << "Test /users response!\n"
+            << "Query parameters:\n"
+            << "min = " << min << '\n'
+            << "max = " << max;
+
+        res.body(ss.str());
+    }
+);
+```
+
 **b_net::Request object have such fields:**
 + *http request fields*
 + *body and it's size in bytes*
@@ -78,7 +123,7 @@ auto& file_route = image_route.SUB_ROUTE(
 
 ### The handler
 
-Handler has two parameters - b_net::Request& and b_net::Response& object. This library will put those objects into the handler, where you can get some request data from b_net::Request object and create response by setting new http protocol fields and body to it. Library will compute body size in octets by itself. It also can compute you file extension in response and type of the body in request, presented in b_net::BodyType by conversing from "Content-Type" field, then you can easily handle request body type in handler function.
+Handler has two parameters - b_net::Request& and b_net::Response& object. This library will insert those objects into the handler, where you can get some request data from b_net::Request object and create response by setting new http protocol fields and body to it. Library will compute body size in octets by itself. It also can compute you file extension in response and type of the body in request, presented in b_net::BodyType by conversing from "Content-Type" field, then you can easily handle request body type in handler function.
 
 ### Nesting
 
