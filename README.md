@@ -16,12 +16,9 @@
 
         b_net::Server server;
 
-        auto& image_route_1 = server.ROOT_ROUTE(
-            // Allowed methods<enum Method> for this route
+        auto& image_route = server.ROOT_ROUTE(
             { GET, HEAD },
-            // Route target<string>
             "/image",
-            // Route handler
             [&](
                 b_net::Request& req,
                 b_net::Response& res
@@ -33,5 +30,37 @@
             }
         );
 
-    
+    <p style="font-size: 10px">
+        Beware of copying returning object. Return it to a reference.
+        Arguments of the ROOT_ROUTE method are:
+        std::vector containing b_net::Method objects
+        route target, presented by std::string
+        handler with signature std::function<void>(b_net::Requst&, b_net::Response)
+
+        As you have seen handler does not returning any value. You need to set
+        response fields and body by using b_net::Response methods.
+    </p>
+    <p style="font-size: 10px">
+        Then you can create a nested route aka sub route as written below.
+        This route will handle request to "/image/file/" target
+    </p>
+
+        auto& avatar_image = image_route.SUB_ROUTE(
+            { GET },
+            "/file",
+            [&](
+                b_net::Request& req,
+                b_net::Response& res
+            ) {
+                std::string file_name = "file";
+                file_name += req.mime_type();
+                std::ofstream file(file_name, std::ios::binary | std::ios::out);
+                if (file.is_open())
+                {
+                    file.write(req.body(), req.body_size());
+                }
+
+                res.body("{\"status\": \"ok\"}", JSON);
+            }
+        );
 </div>
