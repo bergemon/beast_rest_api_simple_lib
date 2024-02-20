@@ -44,7 +44,7 @@ auto& image_route = server.ROOT_ROUTE(
 
 As you have seen handler does not returning any value. You need to set response fields and body by using b_net::Response methods.
 
-### Then you can create a nested route aka sub route as written below.
+### Then you can create a nested route aka sub route as written below:
 
 This route will handle request to "/image/file/" target
 
@@ -126,7 +126,7 @@ auto& users_route = server.ROOT_ROUTE(
 
 ### The handler
 
-Handler has two parameters - b_net::Request& and b_net::Response& object. This library will insert those objects into the handler, where you can get some request data from b_net::Request object and create response by setting new http protocol fields and body to it. Library will compute body size in octets by itself. It also can compute you file extension in response and type of the body in request, presented in b_net::BodyType by conversing from "Content-Type" field, then you can easily handle request body type in handler function.
+Handler has two parameters - b_net::Request& and b_net::Response& object. This library will insert those objects into the handler, where you can get some request data from b_net::Request object and create response by setting new http protocol fields and body to it. Library will compute body size in octets by itself. It also can compute your file extension in response and type of the body in request, presented in b_net::BodyType by conversing from "Content-Type" field, then you can easily handle request body type in handler function.
 
 ### Nesting
 
