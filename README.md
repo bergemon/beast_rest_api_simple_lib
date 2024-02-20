@@ -32,11 +32,13 @@
 
 <p style="font-size: 10px">
 Beware of copying returning object. Return it to a reference.
-Arguments of the ROOT_ROUTE method are:
-<div style="display: flex; flex-direction: column; gap: 5px">
-<p>std::vector containing b_net::Method objects</p>
-<p>route target, presented by std::string</p>
-<p>handler with signature std::function<void>(b_net::Requst&, b_net::Response)</p>
+<p style="font-weight: bold">Arguments of the ROOT_ROUTE method are:</p>
+<div style="display: flex; flex-direction: column">
+<p style="color: blue">std::vector containing b_net::Method objects</p>
+<p style="color: blue">route target, presented by std::string</p>
+<p style="color: blue">handler with signature
+<span style="color: red">std::function<void>(b_net::Requst&, b_net::Response)</span>
+</p>
 </div>
 
 As you have seen handler does not returning any value. You need to set
