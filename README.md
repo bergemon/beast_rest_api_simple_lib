@@ -1,13 +1,13 @@
-#Simple library to handle incoming request - b_net
+#Simple library to handle incoming request - b_net#
 
-##Can be used not only for the Rest API - you can also set static files to the created routes
+##Can be used not only for the Rest API - you can also set static files to the created routes##
 
-###Quick Start:
+###Quick Start:###
 
 You can simply create a route like it's written below:
 
 ```
-#include "simple_server/server.hpp"
+#include "simple_server/server.hpp"#
 
 b_net::Server server;
 
