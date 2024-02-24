@@ -157,7 +157,7 @@ auto& index_route = server.ROOT_ROUTE(
         b_net::error_code ec = res.file_body(website_catalog + "index.html");
 
         if(ec.error())
-            std::cout << ec.message() << std::endl;
+            std::cerr << ec.message() << std::endl;
     }
 );
 
