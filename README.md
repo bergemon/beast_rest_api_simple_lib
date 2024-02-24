@@ -164,6 +164,6 @@ auto& index_route = server.ROOT_ROUTE(
 index_route.static_file(website_catalog + "main.css");
 ```
 
-### Slash at the end of the request target
+### Slash at the end of the requested target
 
 This library will redirrect any request if it does not have a slash at the end of the requested target. For example - if requested route is /test_route, then library will redirrect request to /test_route/ target with code 301 (Moved permanently).
