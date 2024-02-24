@@ -12,11 +12,11 @@ namespace b_net {
         ParsedConfig() { }
         ParsedConfig(uint16_t port, uint16_t threads)
             : m_port(port), m_threads(threads) { }
-
+            
         // Setters
         void set_port(uint16_t port) { m_port = port; }
         void set_threads(uint16_t threads) { m_threads = threads; }
-        
+    
         // Getters
         const uint16_t port() const { return m_port; }
         const uint16_t threads() const { return m_threads; }
@@ -34,7 +34,34 @@ namespace b_net {
         std::vector<std::thread> m_threadsArray;
         const uint32_t m_threads;
         // root routes that would be handled
-        std::vector<b_net::RoutesContainer> m_routes;
+        std::vector<RoutesContainer> m_routes;
+
+        // Recursive function to find any routes with slug and without handler
+        const bool check_route_container(
+            const std::vector<RoutesContainer>& array
+        ) const
+        {
+            // Iterate subroutes
+            for (auto& route : array)
+            {
+                if (!route.valid_slug())
+                {
+                    return false;
+                }
+                
+                // If route has subroutes then we invoke this function again
+                if (route.sub_routes().size())
+                {
+                    // Recursion here
+                    if (!check_route_container(route.sub_routes()))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
 
     public:
         Server()
@@ -130,6 +157,11 @@ namespace b_net {
         // Run the server, start to listen incoming messages on the setted port
         void run()
         {
+            if (!check_route_container(m_routes))
+            {
+                throw std::runtime_error("Route without handler can't have a slug");
+            }
+
             // Start to listen incoming connections
             m_listener->run();
 

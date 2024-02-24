@@ -43,13 +43,20 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     bool isValid (const std::string target = "0")
     {
-        if (target.find("..") != std::string::npos
+        if(
+            target.find("..") != std::string::npos
+            || target.find(".") < target.rfind(".")
+            || target.find(",") != std::string::npos
+            || target.find(" ") != std::string::npos
             || target.find("//") != std::string::npos
             || target.at(0) != '/'
             || target.length() < 2
             || target.find("?") > target.find("&")
+            || target.find("&") < target.rfind("/")
+            || target.find("?") < target.rfind("/")
             || target.find("&&") != std::string::npos
-            || target.find("??") != std::string::npos)
+            || target.find("??") != std::string::npos
+        )
         { return false; }
 
         return true;

@@ -79,7 +79,7 @@ namespace HandleRequest {
             for (auto& route : *current_iterable_container) {
                 // Check if target is equal to current nesting route
                 // And handle request if it's equal
-                if (route.handler().isTarget(target, nested_target))
+                if (route.handler().isTarget(target, nested_target, req))
                 {
                     return handle_route(req, res, route.handler());
                 }

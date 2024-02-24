@@ -16,6 +16,13 @@ namespace b_net {
         BINARY
     };
 
+    // Slug type
+    enum SlugType {
+        NO_SLUG,
+        INT_SLUG,
+        STR_SLUG
+    };
+
     // Class container for parsed data that has only
     // two fields name and value
     class ParsedField final {

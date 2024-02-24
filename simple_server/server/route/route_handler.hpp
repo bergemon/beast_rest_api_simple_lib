@@ -8,7 +8,11 @@ namespace b_net {
         const Type m_type;
 
     public:
-        Query(const std::string query, const bool required = false, const Type type = Type::STR_)
+        Query(
+            const std::string query,
+            const bool required = false,
+            const Type type = Type::STR_
+        )
             : m_query(query), m_required(required), m_type(type)
         { }
 
@@ -19,11 +23,21 @@ namespace b_net {
     };
 
     class RouteHandler {
+        const SlugType m_slug_type;
         const std::string m_target;
         const std::vector<Method> m_methods;
         const bool m_all_methods;
         const std::vector<Query> m_queries;
         const std::function<void(Request&, Response&)> m_handler;
+
+        const SlugType check_slug(const std::string target) const
+        {
+            return target.find("<int>") != std::string::npos
+            ? INT_SLUG
+            : target.find("<str>") != std::string::npos
+            ? STR_SLUG
+            : NO_SLUG;
+        }
 
     public:
         RouteHandler(
@@ -32,9 +46,9 @@ namespace b_net {
             const std::vector<Query> queries,
             const std::function<void(Request&, Response&)> handler
         )
-            : m_methods(methods), m_target(target),
+            : m_methods(methods), m_target(parse_target(target)),
             m_queries(queries), m_handler(handler),
-            m_all_methods(hasAllMethod())
+            m_all_methods(hasAllMethod()), m_slug_type(check_slug(target))
         { }
 
         const bool hasAllMethod() const
@@ -46,7 +60,23 @@ namespace b_net {
             return false;
         }
 
-        const bool isTarget(std::string target, const std::string nested_target) const
+        const std::string parse_target(std::string target) const
+        {
+            if (m_slug_type != SlugType::NO_SLUG)
+            {
+                target = target.substr(0, target.rfind("/"));
+            }
+
+            return target;
+        }
+
+        const SlugType slug_type() const { return m_slug_type; }
+
+        const bool isTarget(
+            std::string target,
+            const std::string nested_target,
+            Request& req
+        ) const
         {
             // target must be pure - without query parameters
             if (target.find("?") != std::string::npos)
@@ -54,11 +84,23 @@ namespace b_net {
                 target = target.substr(0, target.find("?"));
             }
 
+            // trim the slash at the end of the target
             if (target.at(target.length() - 1) == '/')
             {
                 target = target.substr(0, target.length() - 1);
             }
 
+            // check if route has slug
+            // cut the slug from the target
+            if (slug_type() != SlugType::NO_SLUG)
+            {
+                const std::string slug = target.substr(target.rfind("/") + 1);
+                req.m_slug = slug;
+
+                target = target.substr(0, target.rfind("/"));
+            }
+
+            // compare request target and accumulated route target
             if (target == nested_target + m_target)
             {
                 return true;
@@ -67,7 +109,9 @@ namespace b_net {
             return false;
         }
 
-        const bool queriesExist(const std::list<ParsedField> parsed_queries) const
+        const bool queriesExist(
+            const std::list<ParsedField> parsed_queries
+        ) const
         {
             bool found = false;
 

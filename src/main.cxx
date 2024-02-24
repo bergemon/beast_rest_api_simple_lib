@@ -9,6 +9,8 @@ int main(int argc, char** argv) {
     system("chcp 1251 > nul");
 #endif
 
+    using namespace b_net;
+
     std::cout << "Pet REST API by bergemon ver. "
         << APP_VERSION_MAJOR << '.' << APP_VERSION_MINOR << '\n'
         << "WebSocket listener will run on the passed port plus five."
@@ -25,18 +27,32 @@ int main(int argc, char** argv) {
         getUsers
     );
 
+    auto& slug_test = server.ROOT_ROUTE(
+        { GET },
+        "/slug/<str>",
+        [](Request& req, Response& res)
+        {
+            std::string response{ "Slug: " + req.slug() };
+            res.body(response, TEXT);
+        }
+    );
+
+    auto& test_error = server.ROOT_ROUTE("/error");
+    auto& test_error2 = test_error.SUB_ROUTE("/error2");
+    auto& test_error3 = test_error2.SUB_ROUTE("/error3/<str>");
+
+
     auto& image_route_1 = server.ROOT_ROUTE(
         // Allowed methods<enum Method> for this route
         { GET, HEAD },
         // Route target<string>
         "/image",
         // Route handler
-        [&](
-            b_net::Request& req,
-            b_net::Response& res
-        ) {
-            b_net::error_code ec = res.file_body("image.jpg");
-            if (ec.get_status() != b_net::status::OK) {
+        [](Request& req, Response& res)
+        {
+            error_code ec = res.file_body("image.jpg");
+
+            if (ec.error()) {
                 std::cerr << ec.message() << std::endl;
             }
         }
@@ -55,10 +71,8 @@ int main(int argc, char** argv) {
             {"hello", false, INT_}
         },
         // Route handler
-        [&](
-            b_net::Request& req,
-            b_net::Response& res
-        ) {
+        [](Request& req, Response& res)
+        {
             std::stringstream ss;
             std::error_code ec;
             ss << "This is test binary response!\n";
@@ -83,10 +97,8 @@ int main(int argc, char** argv) {
         // Route target<string>
         "/file",
         // Route handler
-        [&](
-            b_net::Request& req,
-            b_net::Response& res
-        ) {
+        [](Request& req, Response& res)
+        {
             std::string file_name = "file";
             file_name += req.mime_type();
             std::ofstream file(file_name, std::ios::binary | std::ios::out);
@@ -104,19 +116,24 @@ int main(int argc, char** argv) {
     auto& hello_route_3 = file_route_2.SUB_ROUTE(
         { ALL },
         "/hello",
-        [&](
-            b_net::Request& req,
-            b_net::Response& res
-        ) {
-            b_net::error_code ec = res.file_body(website_catalog + "index.html");
+        [website_catalog](Request& req, Response& res)
+        {
+            error_code ec = res.file_body(website_catalog + "index.html");
 
             if(ec.error())
                 std::cout << ec.message() << std::endl;
         }
     );
     hello_route_3.static_file(website_catalog + "main.css");
+    hello_route_3.static_file(website_catalog + "script.js");
 
-    server.run();
+    try {
+        server.run();
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
 
     return EXIT_SUCCESS;
 }

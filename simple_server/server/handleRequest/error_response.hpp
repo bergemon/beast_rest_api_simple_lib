@@ -42,7 +42,11 @@ namespace b_net_errs {
 
         if (target.find("?") != std::string::npos)
         {
-            req.target() = target.substr(1, target.find("?") - 1);
+            target = target.substr(1, target.find("?") - 1);
+        }
+        else if (target.at(target.length() - 1) == '/')
+        {
+            target = target.substr(1, target.length() - 2);
         }
         else
         {

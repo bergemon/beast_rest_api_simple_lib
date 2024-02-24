@@ -46,3 +46,8 @@ using b_net::ParsedField;
 
 // Error code custom class
 using b_net::status;
+
+// Slug types
+using b_net::SlugType::NO_SLUG;
+using b_net::SlugType::INT_SLUG;
+using b_net::SlugType::STR_SLUG;

@@ -2,6 +2,8 @@
 #include "../sharedData/sharedFunctions.hpp"
 
 namespace b_net {
+    class RouteHandler;
+
     class Request final {
         std::string m_target;
         uint32_t m_version;
@@ -13,6 +15,9 @@ namespace b_net {
         std::list<ParsedField>& m_cookies;
         Method m_method;
         BodyType m_type;
+        std::string m_slug;
+
+        friend class RouteHandler;
 
     public:
         Request(
@@ -72,6 +77,9 @@ namespace b_net {
 
         // Extension of the request body (.jpg for example or .html)
         BodyType type() const { return m_type; }
+
+        // Get the slug
+        std::string slug() const { return m_slug; }
 
         // Get mime type aka file extension
         const std::string mime_type()

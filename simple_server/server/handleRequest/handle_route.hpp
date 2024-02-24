@@ -5,11 +5,11 @@ namespace b_net {
     http::message_generator handle_route(
         b_net::Request req,
         b_net::Response& res,
-        const RouteHandler& route
+        const RouteHandler& route_handler
     )
     {
         // Check request method
-        if(!route.methodAllowed(req.method()))
+        if(!route_handler.methodAllowed(req.method()))
         {
             return b_net_errs::bad_request(
                 "Bad request. Method not allowed",
@@ -20,7 +20,7 @@ namespace b_net {
         }
 
         // Check query parameters
-        if(!route.queriesExist(req.queries()))
+        if(!route_handler.queriesExist(req.queries()))
         {
             return b_net_errs::bad_request(
                 "Bad request. Not allowed query parameter(s)",
@@ -33,7 +33,7 @@ namespace b_net {
         // Invoke route handler and get custom b_net response class
         try
         {
-            route.handler()(req, res.clear());
+            route_handler.handler()(req, res.clear());
         }
         catch (const std::exception& e)
         {

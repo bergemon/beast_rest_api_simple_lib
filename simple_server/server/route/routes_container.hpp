@@ -2,15 +2,16 @@
 #include "route_handler.hpp"
 
 namespace b_net {
+    class Server;
     class RoutesContainer;
 }
 
 namespace HandleRequest {
     template <class Body, class Allocator>
     http::message_generator handle_request (
-        b_net::Response& res,
-        http::request<Body, http::basic_fields<Allocator>>&& req,
-        std::vector<b_net::RoutesContainer>& root_routes
+        b_net::Response&,
+        http::request<Body, http::basic_fields<Allocator>>&&,
+        std::vector<b_net::RoutesContainer>&
     );
 }
 
@@ -65,12 +66,38 @@ namespace b_net {
             return parsed_target == m_target;
         }
 
+        const bool valid_slug() const
+        {
+            // Return false if route hasn't handler but has a slug
+            if(
+                (m_target.find("<int>") != std::string::npos
+                || m_target.find("<str>") != std::string::npos)
+                && !m_route_handler.has_value()
+            )
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Get root target
+        const std::string& target() const { return m_target; }
+
+        // Root route handler getter
+        const RouteHandler& handler() const { return *m_route_handler; }
+
+        // Get array of routes
+        const std::vector<RoutesContainer>& sub_routes() const { return m_routes; }
+
+        friend class Server;
+
         template <class Body, class Allocator>
         friend http::message_generator HandleRequest::handle_request (
-                b_net::Response& res,
-                http::request<Body, http::basic_fields<Allocator>>&& req,
-                std::vector<b_net::RoutesContainer>& root_routes
-            );
+            b_net::Response&,
+            http::request<Body, http::basic_fields<Allocator>>&&,
+            std::vector<b_net::RoutesContainer>&
+        );
 
     public:
         // Empty root route
@@ -123,6 +150,14 @@ namespace b_net {
         }
 
         // New routes of these root route
+        // Empty new route - root route
+        [[nodiscard]] RoutesContainer& SUB_ROUTE(
+            const std::string target
+        )
+        {
+            m_routes.emplace_back(target, m_route_nest + 1);
+            return m_routes.back();
+        }
         // Put new route to handle by the server (with queries)
         [[nodiscard]] RoutesContainer& SUB_ROUTE(
             const std::vector<Method> methods,
@@ -168,14 +203,5 @@ namespace b_net {
                 m_route_nest + 1
             );
         }
-
-        // Get root target
-        const std::string& target() const { return m_target; }
-
-        // Root route handler getter
-        const RouteHandler& handler() const { return *m_route_handler; }
-
-        // Get array of routes
-        const std::vector<RoutesContainer>& sub_routes() const { return m_routes; }
     };
 }
