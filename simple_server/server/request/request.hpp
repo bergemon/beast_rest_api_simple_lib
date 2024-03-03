@@ -13,8 +13,8 @@ namespace b_net {
         std::list<ParsedField>& m_fields;
         std::list<ParsedField>& m_queries;
         std::list<ParsedField>& m_cookies;
-        Method m_method;
-        BodyType m_type;
+        method m_method;
+        body_type m_type;
         std::string m_slug;
 
         friend class RouteHandler;
@@ -29,8 +29,8 @@ namespace b_net {
             std::list<ParsedField>& fields,
             std::list<ParsedField>& queries,
             std::list<ParsedField>& cookies,
-            Method method,
-            BodyType type
+            method method,
+            body_type type
         )
             : m_target(target), m_version(version),
             m_keep_alive(keep_alive), m_fields(fields),
@@ -73,10 +73,10 @@ namespace b_net {
         const std::list<ParsedField>& cookies() const { return m_cookies; }
 
         // Request method
-        Method method() const { return m_method; }
+        method method() const { return m_method; }
 
         // Extension of the request body (.jpg for example or .html)
-        BodyType type() const { return m_type; }
+        body_type type() const { return m_type; }
 
         // Get the slug
         std::string slug() const { return m_slug; }

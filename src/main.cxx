@@ -13,8 +13,10 @@ int main(int argc, char** argv) {
 
     std::cout << "Pet REST API by bergemon ver. "
         << APP_VERSION_MAJOR << '.' << APP_VERSION_MINOR << '\n'
-        << "WebSocket listener will run on the passed port plus five."
+        // << "WebSocket listener will run on the passed port plus five."
         << std::endl;
+
+    Server& server = Server::get_server();
 
     auto& users_route_1 = server.ROOT_ROUTE(
         // Allowed methods<enum Method> for this route
@@ -34,27 +36,6 @@ int main(int argc, char** argv) {
         {
             std::string response{ "Slug: " + req.slug() };
             res.body(response, TEXT);
-        }
-    );
-
-    auto& test_error = server.ROOT_ROUTE("/error");
-    auto& test_error2 = test_error.SUB_ROUTE("/error2");
-    auto& test_error3 = test_error2.SUB_ROUTE("/error3/<str>");
-
-
-    auto& image_route_1 = server.ROOT_ROUTE(
-        // Allowed methods<enum Method> for this route
-        { GET, HEAD },
-        // Route target<string>
-        "/image",
-        // Route handler
-        [](Request& req, Response& res)
-        {
-            error_code ec = res.file_body("image.jpg");
-
-            if (ec.error()) {
-                std::cerr << ec.message() << std::endl;
-            }
         }
     );
 
@@ -111,6 +92,32 @@ int main(int argc, char** argv) {
         }
     );
 
+    auto& image_route_1 = server.ROOT_ROUTE(
+        // Allowed methods<enum Method> for this route
+        { GET, HEAD },
+        // Route target<string>
+        "/image",
+        // Route handler
+        [](Request& req, Response& res)
+        {
+            error_code ec = res.file_body("image.jpg");
+
+            if (ec.error()) {
+                std::cerr << ec.message() << std::endl;
+            }
+        }
+    );
+
+    auto& test_error = users_route_1.SUB_ROUTE("/error1");
+    auto& test_error2 = users_route_1.SUB_ROUTE(
+        { GET },
+        "/error2",
+        [](Request& req, Response& res) {
+            res.body("/error5", TEXT);
+        }
+    );
+    auto& test_error3 = test_error2.SUB_ROUTE("/error3");
+
     const std::string website_catalog{ "website/" };
 
     auto& hello_route_3 = file_route_2.SUB_ROUTE(
@@ -127,13 +134,7 @@ int main(int argc, char** argv) {
     hello_route_3.static_file(website_catalog + "main.css");
     hello_route_3.static_file(website_catalog + "script.js");
 
-    try {
-        server.run();
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-    }
+    server.run();
 
     return EXIT_SUCCESS;
 }

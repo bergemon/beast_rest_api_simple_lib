@@ -6,7 +6,7 @@ namespace b_net_errs {
     // Return bad request - 400
     http::message_generator
         bad_request
-        (const std::string why, uint32_t version, bool keep_alive, b_net::Method method)
+        (const std::string why, uint32_t version, bool keep_alive, b_net::method method)
     {
         http::response<http::string_body> res{http::status::bad_request, version};
         res.set(http::field::server, BOOST_BEAST_VERSION_STRING);

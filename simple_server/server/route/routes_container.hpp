@@ -11,7 +11,7 @@ namespace HandleRequest {
     http::message_generator handle_request (
         b_net::Response&,
         http::request<Body, http::basic_fields<Allocator>>&&,
-        std::vector<b_net::RoutesContainer>&
+        const std::list<b_net::RoutesContainer>*
     );
 }
 
@@ -24,7 +24,7 @@ namespace b_net {
         // Root route handler
         std::optional<RouteHandler> m_route_handler;
         // Routes of root route aka subroutes
-        std::vector<RoutesContainer> m_routes;
+        std::list<RoutesContainer> m_routes;
 
         // Private method only for request handler
         // Check if requested target contains root route
@@ -66,19 +66,25 @@ namespace b_net {
             return parsed_target == m_target;
         }
 
-        const bool valid_slug() const
+        // Returns true if this route has a slug
+        const bool has_slug() const {
+            return m_target.find("/<int>") != std::string::npos
+                || m_target.find("/<str>") != std::string::npos;
+        }
+
+        void valid_slug() const
         {
             // Return false if route hasn't handler but has a slug
-            if(
-                (m_target.find("<int>") != std::string::npos
-                || m_target.find("<str>") != std::string::npos)
-                && !m_route_handler.has_value()
-            )
+            if (has_slug() && !m_route_handler.has_value())
             {
-                return false;
+                throw std::runtime_error("Route without handler can't have a slug");
             }
 
-            return true;
+            // Or if route has a slug and nested routes
+            if (has_slug() && m_routes.size())
+            {
+                throw std::runtime_error("Route with slug can't have subroutes");
+            }
         }
 
         // Get root target
@@ -88,7 +94,7 @@ namespace b_net {
         const RouteHandler& handler() const { return *m_route_handler; }
 
         // Get array of routes
-        const std::vector<RoutesContainer>& sub_routes() const { return m_routes; }
+        const std::list<RoutesContainer>& sub_routes() const { return m_routes; }
 
         friend class Server;
 
@@ -96,7 +102,7 @@ namespace b_net {
         friend http::message_generator HandleRequest::handle_request (
             b_net::Response&,
             http::request<Body, http::basic_fields<Allocator>>&&,
-            std::vector<b_net::RoutesContainer>&
+            const std::list<b_net::RoutesContainer>*
         );
 
     public:
@@ -107,9 +113,9 @@ namespace b_net {
 
         // Root route with queries
         RoutesContainer(
-            const std::vector<Method> methods,
+            const std::vector<method> methods,
             const std::string target,
-            const std::vector<Query> queries,
+            const std::vector<query> queries,
             const std::function<void(Request&, Response&)> handler,
             const uint32_t nesting
         )
@@ -118,13 +124,13 @@ namespace b_net {
 
         // Root route without queries
         RoutesContainer(
-            const std::vector<Method> methods,
+            const std::vector<method> methods,
             const std::string target,
             const std::function<void(Request&, Response&)> handler,
             const uint32_t nesting
         )
             : m_target(target), m_route_nest(nesting)
-        { m_route_handler.emplace(methods, target, std::vector<Query>(), handler); }
+        { m_route_handler.emplace(methods, target, std::vector<query>(), handler); }
 
         ////////////////////////////////////////////
         // METHODS
@@ -133,8 +139,8 @@ namespace b_net {
         // Set handlers for the root route
         // Set root route handler with queries
         void SET_HANDLER(
-            const std::vector<Method> methods,
-            const std::vector<Query> queries,
+            const std::vector<method> methods,
+            const std::vector<query> queries,
             const std::function<void(Request&, Response&)> handler
         )
         {
@@ -142,11 +148,11 @@ namespace b_net {
         }
         // Set root route handler without queries
         void SET_HANDLER(
-            const std::vector<Method> methods,
+            const std::vector<method> methods,
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_route_handler.emplace(methods, m_target, std::vector<Query>(), handler);
+            m_route_handler.emplace(methods, m_target, std::vector<query>(), handler);
         }
 
         // New routes of these root route
@@ -160,9 +166,9 @@ namespace b_net {
         }
         // Put new route to handle by the server (with queries)
         [[nodiscard]] RoutesContainer& SUB_ROUTE(
-            const std::vector<Method> methods,
+            const std::vector<method> methods,
             const std::string target,
-            const std::vector<Query> queries,
+            const std::vector<query> queries,
             const std::function<void(Request&, Response&)> handler
         )
         {
@@ -171,12 +177,12 @@ namespace b_net {
         }
         // Put new route to handle by the server (without queries)
         [[nodiscard]] RoutesContainer& SUB_ROUTE(
-            const std::vector<Method> methods,
+            const std::vector<method> methods,
             const std::string target,
             const std::function<void(Request&, Response&)> handler
         )
         {
-            m_routes.emplace_back(methods, target, std::vector<Query>(), handler, m_route_nest + 1);
+            m_routes.emplace_back(methods, target, std::vector<query>(), handler, m_route_nest + 1);
             return m_routes.back();
         }
 
@@ -188,9 +194,9 @@ namespace b_net {
             const std::string target{ path.substr((path.rfind("/") == std::string::npos) ? 0 : (path.rfind("/") + 1)) };
 
             m_routes.emplace_back(
-                std::vector<Method>({ GET }),
+                std::vector<method>({ GET }),
                 std::string('/' + target),
-                std::vector<Query>(),
+                std::vector<query>(),
                 std::function<void(Request&, Response&)>(
                     [path, target](Request& req, Response& res) -> void
                     {

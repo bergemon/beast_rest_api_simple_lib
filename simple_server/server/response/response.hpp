@@ -2,26 +2,26 @@
 #include "../request/request.hpp"
 
 namespace b_net {
-    struct Field final {
-    private:
-        std::string m_name;
-        std::string m_value;
-
-    public:
-        Field(std::string name, std::string value)
-            : m_name(name), m_value(value)
-        { }
-
-        const char* name() const { return m_name.c_str(); }
-        const char* value() const { return m_value.c_str(); }
-    };
-
     class Response final {
+        struct HeaderField {
+        private:
+            std::string m_name;
+            std::string m_value;
+
+        public:
+            HeaderField(std::string name, std::string value)
+                : m_name(name), m_value(value)
+            { }
+
+            const char* name() const { return m_name.c_str(); }
+            const char* value() const { return m_value.c_str(); }
+        };
+
     protected:
         unsigned char* m_body = nullptr;
         size_t m_size = 0;
-        std::list<Field> m_set_fields;
-        std::list<Field> m_ins_fields;
+        std::list<HeaderField> m_set_fields;
+        std::list<HeaderField> m_ins_fields;
         
         ////////////////////////////////////////////
         // Getters and friendly funtion for them //
@@ -32,12 +32,12 @@ namespace b_net {
         [[nodiscard]] size_t get_size() { return m_size; }
         // List of fields to set
         [[nodiscard]]
-            std::list<Field>& set_fields() { return m_set_fields; }
+            std::list<HeaderField>& set_fields() { return m_set_fields; }
         // List of field to insert
         [[nodiscard]]
-            std::list<Field>& insert_fields() { return m_ins_fields; }
+            std::list<HeaderField>& insert_fields() { return m_ins_fields; }
         // Boost Beast response creator friendly function
-        friend http::message_generator create_response(Response&, const uint32_t, const bool, const Method);
+        friend http::message_generator create_response(Response&, const uint32_t, const bool, const method);
 
         size_t check(const char* body = nullptr)
         {
@@ -93,35 +93,35 @@ namespace b_net {
         }
 
         // Const char response body
-        void body(const char* body, BodyType type = JSON)
+        void body(const char* body, body_type type = JSON)
         {
             using namespace utility_;
             initialize(check(body), body);
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // Array of chars response body
-        void body(char* body, BodyType type = JSON)
+        void body(char* body, body_type type = JSON)
         {
             using namespace utility_;
             initialize(check(body), body);
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // String response body
-        void body(std::string body, BodyType type = JSON)
+        void body(std::string body, body_type type = JSON)
         {
             using namespace utility_;
             initialize(body.length(), body.c_str());
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // Binary body. You need to point number of body octets.
-        void body(char* body, size_t size, BodyType type = BINARY)
+        void body(char* body, size_t size, body_type type = BINARY)
         {
             using namespace utility_;
             initialize(size, body);
             content_type(mime_type(bodyType_to_mimeType(type)));
         }
         // Binary body. You need to point number of body octets.
-        void body(const char* body, size_t size, BodyType type = BINARY)
+        void body(const char* body, size_t size, body_type type = BINARY)
         {
             using namespace utility_;
             initialize(size, body);
@@ -169,20 +169,20 @@ namespace b_net {
         // For purpose of setting another field with the same name use insert method.
         void set(std::string name, std::string value)
         {
-            m_set_fields.push_back(Field(name, value));
+            m_set_fields.emplace_back(name, value);
         }
         // Insert a field. If one or more fields with the same name already exist,
         // the new field will be inserted after the last field with the matching name
         // in serialization order. The value can be an empty string.
         void insert(std::string name, std::string value)
         {
-            m_ins_fields.push_back(Field(name, value));
+            m_ins_fields.emplace_back(name, value);
         }
 
         // Set content type for binary file
         void content_type(std::string text)
         {
-            m_set_fields.push_back(Field("Content-Type", text));
+            m_set_fields.emplace_back("Content-Type", text);
         }
     };
 }

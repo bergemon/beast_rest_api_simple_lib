@@ -2,35 +2,35 @@
 #include "../response/response.hpp"
 
 namespace b_net {
-    class Query {
+    class query final {
         const std::string m_query;
         const bool m_required;
-        const Type m_type;
+        const query_type m_type;
 
     public:
-        Query(
+        query(
             const std::string query,
             const bool required = false,
-            const Type type = Type::STR_
+            const query_type type = query_type::STR_
         )
             : m_query(query), m_required(required), m_type(type)
         { }
 
         // Query getters
-        std::string getQuery () const { return m_query; }
-        Type getType () const { return m_type; }
+        std::string get_query () const { return m_query; }
+        query_type get_type () const { return m_type; }
         bool isRequired () const { return m_required; }
     };
 
-    class RouteHandler {
-        const SlugType m_slug_type;
+    class RouteHandler final {
+        const slug_type m_slug_type;
         const std::string m_target;
-        const std::vector<Method> m_methods;
+        const std::vector<method> m_methods;
         const bool m_all_methods;
-        const std::vector<Query> m_queries;
+        const std::vector<query> m_queries;
         const std::function<void(Request&, Response&)> m_handler;
 
-        const SlugType check_slug(const std::string target) const
+        const slug_type check_slug(const std::string target) const
         {
             return target.find("<int>") != std::string::npos
             ? INT_SLUG
@@ -41,9 +41,9 @@ namespace b_net {
 
     public:
         RouteHandler(
-            const std::vector<Method> methods,
+            const std::vector<method> methods,
             const std::string target,
-            const std::vector<Query> queries,
+            const std::vector<query> queries,
             const std::function<void(Request&, Response&)> handler
         )
             : m_methods(methods), m_target(parse_target(target)),
@@ -55,14 +55,14 @@ namespace b_net {
         {
             for (const auto& elem : m_methods)
             {
-                if(elem == Method::ALL) { return true; }
+                if(elem == method::ALL) { return true; }
             }
             return false;
         }
 
         const std::string parse_target(std::string target) const
         {
-            if (m_slug_type != SlugType::NO_SLUG)
+            if (m_slug_type != slug_type::NO_SLUG)
             {
                 target = target.substr(0, target.rfind("/"));
             }
@@ -70,7 +70,7 @@ namespace b_net {
             return target;
         }
 
-        const SlugType slug_type() const { return m_slug_type; }
+        const slug_type slug_type() const { return m_slug_type; }
 
         const bool isTarget(
             std::string target,
@@ -92,7 +92,7 @@ namespace b_net {
 
             // check if route has slug
             // cut the slug from the target
-            if (slug_type() != SlugType::NO_SLUG)
+            if (slug_type() != slug_type::NO_SLUG)
             {
                 const std::string slug = target.substr(target.rfind("/") + 1);
                 req.m_slug = slug;
@@ -125,7 +125,7 @@ namespace b_net {
 
                 for (const auto& parsed_query : parsed_queries)
                 {
-                    if (parsed_query.name() == query.getQuery())
+                    if (parsed_query.name() == query.get_query())
                     {
                         queryExist = true;
                         break;
@@ -143,7 +143,7 @@ namespace b_net {
 
                 for (const auto& query : m_queries)
                 {
-                    if (query.getQuery() == parsed_query.name())
+                    if (query.get_query() == parsed_query.name())
                     {
                         queryExist = true;
                         break;
@@ -157,7 +157,7 @@ namespace b_net {
             return true;
         }
 
-        const bool methodAllowed(const Method req_method) const
+        const bool methodAllowed(const method req_method) const
         {
             if (m_all_methods)
                 return true;

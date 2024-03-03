@@ -7,11 +7,11 @@ namespace Session {
         beast::tcp_stream m_stream;
         beast::flat_buffer m_buffer;
         std::optional<http::request_parser<http::dynamic_body>> m_parser;
-        std::vector<b_net::RoutesContainer>& m_routes;
+        std::list<b_net::RoutesContainer>& m_routes;
         b_net::Response m_custom_response;
 
     public:
-        Session(tcp::socket&& socket, std::vector<b_net::RoutesContainer>& root_routes)
+        Session(tcp::socket&& socket, std::list<b_net::RoutesContainer>& root_routes)
             : m_stream(std::move(socket)), m_routes(root_routes)
         { }
 
@@ -48,7 +48,7 @@ namespace Session {
                 HandleRequest::handle_request(
                     m_custom_response,
                     std::move(m_parser->get()),
-                    m_routes
+                    &m_routes
                 )
             );
         }

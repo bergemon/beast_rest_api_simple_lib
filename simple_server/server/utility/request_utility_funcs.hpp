@@ -13,7 +13,7 @@ namespace utility_ {
     {
         for (const auto& elem : header)
         {
-            list.push_back(ParsedField(elem.name_string(), elem.value()));
+            list.push_back({elem.name_string(), elem.value()});
         }
 
         return list;
@@ -58,19 +58,19 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Convert beast request method to custom b_net::Method
     //////////////////////////////////////////////////////////////////////
-    b_net::Method convert_method(http::verb method)
+    b_net::method convert_method(http::verb method)
     {
         using namespace b_net;
 
         switch(method)
         {
-            case http::verb::head: return Method::HEAD;
-            case http::verb::get: return Method::GET;
-            case http::verb::post: return Method::POST;
-            case http::verb::put: return Method::PUT;
-            case http::verb::delete_: return Method::DELETE_;
-            case http::verb::patch: return Method::PATCH;
-            default: return Method::HEAD;
+            case http::verb::head: return method::HEAD;
+            case http::verb::get: return method::GET;
+            case http::verb::post: return method::POST;
+            case http::verb::put: return method::PUT;
+            case http::verb::delete_: return method::DELETE_;
+            case http::verb::patch: return method::PATCH;
+            default: return method::HEAD;
         }
     }
 
@@ -93,11 +93,11 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Parse cookies from the string
     //////////////////////////////////////////////////////////////////////
-    std::list<b_net::ParsedField>&
+    std::list<ParsedField>&
         parse_cookies
         (
             std::list<ParsedField>& header,
-            std::list<b_net::ParsedField>& list
+            std::list<ParsedField>& list
         )
     {
         std::string cookies{ get_cookie_field(header) };
@@ -122,7 +122,7 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // Mime type to b_net BodyType
     //////////////////////////////////////////////////////////////////////
-    b_net::BodyType mimeType_to_bodyType(std::string mime_type)
+    b_net::body_type mimeType_to_bodyType(std::string mime_type)
     {
         using namespace b_net;
 

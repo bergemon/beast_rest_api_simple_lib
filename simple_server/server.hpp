@@ -2,30 +2,33 @@
 #include "server/HTTP/listener.hpp"
 
 namespace b_net {
-    // Parsed config class that contains all information
-    // that needs to initialize b_net server
-    class ParsedConfig {
-        uint16_t m_port;
-        uint16_t m_threads;
-
-    public:
-        ParsedConfig() { }
-        ParsedConfig(uint16_t port, uint16_t threads)
-            : m_port(port), m_threads(threads) { }
-            
-        // Setters
-        void set_port(uint16_t port) { m_port = port; }
-        void set_threads(uint16_t threads) { m_threads = threads; }
-    
-        // Getters
-        const uint16_t port() const { return m_port; }
-        const uint16_t threads() const { return m_threads; }
-    };
-
     // Server class that can handle request - check routes, queries and make response
     // Constructor: (usigned short port, int threads)
     using Listener::Listener;
     class Server {
+        // Parsed config class that contains all information
+        // that needs to initialize b_net server
+        class ParsedConfig {
+            uint16_t m_port;
+            uint16_t m_threads;
+
+            // Setters
+            void set_port(uint16_t port) { m_port = port; }
+            void set_threads(uint16_t threads) { m_threads = threads; }
+        
+            // Getters
+            const uint16_t port() const { return m_port; }
+            const uint16_t threads() const { return m_threads; }
+
+            ParsedConfig() { }
+            ParsedConfig(uint16_t port, uint16_t threads)
+                : m_port(port), m_threads(threads) { }
+
+            friend class Server;
+        };
+        // We can have only one instance of the server class
+        static Server m_server;
+
         // config settings
         const ParsedConfig m_config;
         // other server class members
@@ -34,43 +37,29 @@ namespace b_net {
         std::vector<std::thread> m_threadsArray;
         const uint32_t m_threads;
         // root routes that would be handled
-        std::vector<RoutesContainer> m_routes;
+        std::list<RoutesContainer> m_routes;
 
         // Recursive function to find any routes with slug and without handler
-        const bool check_route_container(
-            const std::vector<RoutesContainer>& array
+        // or with slug and nested routes (routes with slug can't have subroutes)
+        // This method throws an exception if something goes wrong
+        void check_route_container(
+            const std::list<RoutesContainer>& list
         ) const
         {
             // Iterate subroutes
-            for (auto& route : array)
+            for (auto& route : list)
             {
-                if (!route.valid_slug())
-                {
-                    return false;
-                }
+                route.valid_slug();
                 
                 // If route has subroutes then we invoke this function again
                 if (route.sub_routes().size())
                 {
                     // Recursion here
-                    if (!check_route_container(route.sub_routes()))
-                    {
-                        return false;
-                    }
+                    check_route_container(route.sub_routes());
                 }
             }
-
-            return true;
         }
-
-    public:
-        Server()
-            : m_config(parse_config()),
-            m_context(std::make_shared<asio::io_context>(m_config.threads())),
-            m_threads(m_config.threads()),
-            m_listener(std::make_shared<Listener>(*m_context, tcp::endpoint{ tcp::v4(), m_config.port() }, m_routes))
-        { }
-
+        
         // Find server config file and create new if it is not exist
         void find_config()
         {
@@ -80,10 +69,7 @@ namespace b_net {
                 std::ofstream config("b_net_config.json", std::ios::out);
                 if (config.is_open())
                 {
-                    config << "{\n"
-                        << "    \"port\": 80,\n"
-                        << "    \"threads\": 1\n"
-                        << "}";
+                    config << "{\n" << "\"port\": 80,\n" << "\"threads\": 1\n" << "}";
                 }
                 config.close();
             }
@@ -119,11 +105,25 @@ namespace b_net {
             return config_;
         }
 
+        Server()
+            : m_config(parse_config()),
+            m_context(std::make_shared<asio::io_context>(m_config.threads())),
+            m_threads(m_config.threads()),
+            m_listener(std::make_shared<Listener>(*m_context, tcp::endpoint{ tcp::v4(), m_config.port() }, m_routes))
+        { }
+
+    public:
+        Server(const Server&) = delete;
+        void operator=(const Server&) = delete;
+
+        // Getter
+        static Server& get_server() { return m_server; }
+
         // Create new root route
         // Warning! This method returns reference to the created object. Do not copy it!
         [[nodiscard]] RoutesContainer& ROOT_ROUTE(const std::string target)
         {
-            m_routes.emplace_back(target, 0);
+            m_routes.push_back({ target, 0 });
             return m_routes.back();
         }
         
@@ -131,9 +131,9 @@ namespace b_net {
         // With queries
         // Warning! This method returns reference to the created object. Do not copy it!
         [[nodiscard]] RoutesContainer& ROOT_ROUTE(
-            const std::vector<Method> methods,
+            const std::vector<method> methods,
             const std::string target,
-            const std::vector<Query> queries,
+            const std::vector<query> queries,
             const std::function<void(Request&, Response&)> handler
         )
         {
@@ -145,7 +145,7 @@ namespace b_net {
         // Without queries
         // Warning! This method returns reference to the created object. Do not copy it!
         [[nodiscard]] RoutesContainer& ROOT_ROUTE(
-            const std::vector<Method> methods,
+            const std::vector<method> methods,
             const std::string target,
             const std::function<void(Request&, Response&)> handler
         )
@@ -157,9 +157,13 @@ namespace b_net {
         // Run the server, start to listen incoming messages on the setted port
         void run()
         {
-            if (!check_route_container(m_routes))
+            try {
+                check_route_container(m_routes);
+            }
+            catch (std::exception& e)
             {
-                throw std::runtime_error("Route without handler can't have a slug");
+                std::cerr << e.what() << std::endl;
+                return;
             }
 
             // Start to listen incoming connections
@@ -173,3 +177,4 @@ namespace b_net {
         }
     };
 }
+b_net::Server b_net::Server::m_server;

@@ -59,7 +59,7 @@ namespace utility_ {
     //////////////////////////////////////////////////////////////////////
     // This function is coverting b_net::BodyType to string mime_type
     //////////////////////////////////////////////////////////////////////
-    inline std::string bodyType_to_mimeType(b_net::BodyType type) {
+    inline std::string bodyType_to_mimeType(b_net::body_type type) {
         using namespace b_net;
 
         switch(type)

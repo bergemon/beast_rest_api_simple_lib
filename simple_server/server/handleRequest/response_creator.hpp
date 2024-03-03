@@ -6,7 +6,7 @@ namespace b_net {
         b_net::Response& b_net_res,
         const uint32_t version,
         const bool keep_alive,
-        const Method method
+        const method method
     )
     {
         using namespace b_net;

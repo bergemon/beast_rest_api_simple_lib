@@ -5,10 +5,10 @@ namespace Listener {
     class Listener : public std::enable_shared_from_this<Listener> {
         asio::io_context& m_context;
         tcp::acceptor m_acceptor;
-        std::vector<b_net::RoutesContainer>& m_routes;
+        std::list<b_net::RoutesContainer>& m_routes;
 
     public:
-        Listener(asio::io_context& context, tcp::endpoint endpoint, std::vector<b_net::RoutesContainer>& root_routes)
+        Listener(asio::io_context& context, tcp::endpoint endpoint, std::list<b_net::RoutesContainer>& root_routes)
             : m_context(context), m_acceptor(asio::make_strand(m_context)), m_routes(root_routes)
         {
             beast::error_code ec;

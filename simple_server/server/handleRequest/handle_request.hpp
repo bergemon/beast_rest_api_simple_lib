@@ -6,7 +6,7 @@ namespace HandleRequest {
     http::message_generator handle_request (
         b_net::Response& res,
         http::request<Body, http::basic_fields<Allocator>>&& beast_req,
-        std::vector<b_net::RoutesContainer>& routes_containers
+        const std::list<b_net::RoutesContainer>* routes
     )
     {
         using namespace b_net;
@@ -69,14 +69,9 @@ namespace HandleRequest {
 
         // Handle incoming request
         std::string nested_target{ "" };
-        const std::vector<RoutesContainer>* current_iterable_container = &routes_containers;
-        bool new_loop;
 
-        while (true)
-        {
-            new_loop = false;
-
-            for (auto& route : *current_iterable_container) {
+        loop_start:
+            for (auto& route : *routes) {
                 // Check if target is equal to current nesting route
                 // And handle request if it's equal
                 if (route.handler().isTarget(target, nested_target, req))
@@ -88,15 +83,10 @@ namespace HandleRequest {
                 if (route.is_root(target))
                 {
                     nested_target += route.target();
-                    current_iterable_container = &route.sub_routes();
-                    new_loop = true;
-                    break;
+                    routes = &route.sub_routes();
+                    goto loop_start;
                 }
             }
-
-            if (!new_loop)
-                break;
-        }
 
         // If we have not found request target aka route
         return b_net_errs::not_found(req);
